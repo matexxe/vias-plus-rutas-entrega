@@ -4,7 +4,7 @@ import { Chart as ChartJS, CategoryScale,
 LinearScale, PointElement, LineElement, Title, Tooltip, Legend,ArcElement } from "chart.js";
 import { Line, Doughnut } from "react-chartjs-2";
 import { stats } from "../data/Stats";
-import { cn } from "../lib/utils";
+import { cn } from "../lib/Utils";
 import { deliveryData, statusData } from "../data/DashboardData";
 
 ChartJS.register(

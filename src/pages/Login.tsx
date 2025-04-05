@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Truck } from "lucide-react";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../lib/Auth";
 
 // Componente de inicio de sesión
 export function Login() {

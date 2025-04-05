@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Truck } from "lucide-react";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "../lib/Auth";
 
 // Definimos los tipos posibles de negocio
 type BusinessType = "store" | "restaurant" | "pharmacy";

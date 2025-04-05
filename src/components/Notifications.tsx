@@ -4,7 +4,7 @@ import { Bell, Check, X, Truck, MapPin } from "lucide-react";
 import { Button } from "../UI/Button"; // Componente reutilizable para botones.
 import { Badge } from "../UI/Badge"; // Componente reutilizable para etiquetas.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../UI/Tabs"; // Componente reutilizable para pestanas de navegacion.
-import { cn } from "../lib/utils"; // Esta es una funcion para combinar clases con Tailwind.
+import { cn } from "../lib/Utils"; // Esta es una funcion para combinar clases con Tailwind.
 import { notificationsData } from "../data/NotificationsData"; // Datos simulados de notificaciones.
 import { Notification } from "../interfaces/Interfaces"; // Interfaces para las notificaciones porque se usa TypeScript.
 
