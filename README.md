@@ -15,3 +15,8 @@ git clone https://github.com/matexxe/vias-plus-rutas-entrega
  ```bash
 npm install
 ```
+
+### Para lanzar la aplicacion:
+ ```bash
+npm run dev
+```
