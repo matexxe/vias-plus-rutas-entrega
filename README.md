@@ -20,3 +20,4 @@ npm install
  ```bash
 npm run dev
 ```
+*Esto es importante:* Todos los datos son simulados. Solo es prueba ya que no he encontrado como ponerlo en produccion en la vida real. 
