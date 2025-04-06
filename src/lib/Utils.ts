@@ -7,7 +7,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Tus funciones existentes
 export function formatTime(minutes: number): string {
   const hours = Math.floor(minutes / 60)
   const remainingMinutes = Math.round(minutes % 60)
