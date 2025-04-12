@@ -1,18 +1,23 @@
-
 import { useState } from "react";
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
-import { orders as initialOrders } from "../data/Orders";
-import OrderForm from "../registros/OrderForm";
-import { Order } from "../interfaces/Orders";
-
+import { orders as initialOrders } from "../data/ClientOrders";
+import { OrderForm } from "../registros/OrderForm";
+import { OrdersClient } from "../interfaces/OrdersClient";
 
 export default function Orders() {
+  // Estado para el término de búsqueda
   const [searchTerm, setSearchTerm] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
-  const [orderToEdit, setOrderToEdit] = useState<Order | null>(null);
 
-  // Filtrar pedidos según el término de búsqueda
+  // Estado para mostrar/ocultar el formulario
+  const [showForm, setShowForm] = useState(false);
+
+  // Estado que contiene la lista de pedidos
+  const [orders, setOrders] = useState<OrdersClient[]>(initialOrders);
+
+  // Estado que almacena el pedido que se va a editar (si aplica)
+  const [orderToEdit, setOrderToEdit] = useState<OrdersClient | null>(null);
+
+  // Filtrado de pedidos en tiempo real basado en el término de búsqueda
   const filteredOrders = orders.filter(
     (order) =>
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -21,38 +26,37 @@ export default function Orders() {
       order.articulo.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Función para agregar un nuevo pedido
-  const handleAddOrder = (orderData: Omit<Order, "id">) => {
-    // Generar un ID único para el nuevo pedido
+  // Agrega un nuevo pedido con un ID generado automáticamente
+  const handleAddOrder = (orderData: Omit<OrdersClient, "id">) => {
     const newId = (orders.length + 1).toString().padStart(3, "0");
 
-    const newOrder: Order = {
+    const newOrder: OrdersClient = {
       id: newId,
       ...orderData,
     };
 
     setOrders([...orders, newOrder]);
-    setShowForm(false);
+    setShowForm(false); // Cierra el formulario después de agregar
   };
 
-  // Función para editar un pedido existente
-  const handleEditOrder = (order: Order) => {
+  // Prepara el formulario para editar un pedido existente
+  const handleEditOrder = (order: OrdersClient) => {
     setOrderToEdit(order);
     setShowForm(true);
   };
 
-  // Función para actualizar un pedido existente
-  const handleUpdateOrder = (updatedOrder: Order) => {
+  // Aplica los cambios al pedido actualizado
+  const handleUpdateOrder = (updatedOrder: OrdersClient) => {
     setOrders(
       orders.map((order) =>
         order.id === updatedOrder.id ? updatedOrder : order
       )
     );
     setOrderToEdit(null);
-    setShowForm(false);
+    setShowForm(false); // Cierra el formulario al guardar cambios
   };
 
-  // Función para eliminar un pedido
+  // Elimina un pedido si el usuario confirma
   const handleDeleteOrder = (orderId: string) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este pedido?")) {
       setOrders(orders.filter((order) => order.id !== orderId));
@@ -61,7 +65,7 @@ export default function Orders() {
 
   return (
     <div className="space-y-6">
-      {/* Título y Botón */}
+      {/* Encabezado con botón para agregar pedidos */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
           Pedidos
@@ -78,7 +82,7 @@ export default function Orders() {
         </button>
       </div>
 
-      {/* Barra de Búsqueda */}
+      {/* Input para búsqueda con ícono */}
       <div className="mb-6">
         <div className="relative">
           <input
@@ -92,51 +96,31 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* Tabla de Pedidos */}
+      {/* Tabla con pedidos filtrados */}
       <div className="bg-white dark:bg-gray-800 shadow overflow-x-auto sm:overflow-hidden sm:rounded-lg">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-              >
+              {/* Encabezados de la tabla */}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 ID
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 Cliente
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 Dirección
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 Estatus
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 Fecha
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 Artículo
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap"
-              >
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 Acciones
               </th>
             </tr>
@@ -157,6 +141,7 @@ export default function Orders() {
                   {order.direccion}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
+                  {/* Estilo visual para el estatus del pedido */}
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       order.estatus === "Entregado/a"
@@ -178,6 +163,7 @@ export default function Orders() {
                   {order.articulo}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  {/* Botón para editar */}
                   <button
                     onClick={() => handleEditOrder(order)}
                     className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 mr-3"
@@ -185,6 +171,7 @@ export default function Orders() {
                   >
                     <Edit className="h-4 w-4" />
                   </button>
+                  {/* Botón para eliminar */}
                   <button
                     onClick={() => handleDeleteOrder(order.id)}
                     className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200"
@@ -199,7 +186,7 @@ export default function Orders() {
         </table>
       </div>
 
-      {/* Formulario Modal para Agregar/Editar Pedidos */}
+      {/* Formulario modal para agregar o editar pedidos */}
       {showForm && (
         <OrderForm
           onClose={() => {
@@ -208,15 +195,17 @@ export default function Orders() {
           }}
           onSubmit={(orderData) => {
             if (orderToEdit) {
+              // Si hay un pedido a editar, se actualiza
               handleUpdateOrder({
                 ...orderToEdit,
                 ...orderData,
               });
             } else {
+              // Si no, se crea un nuevo pedido
               handleAddOrder(orderData);
             }
           }}
-          initialData={orderToEdit || {} as Order}
+          initialData={orderToEdit || ({} as OrdersClient)}
         />
       )}
     </div>

@@ -5,13 +5,13 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Layout } from "./components/Layout";
-import { Dashboard } from "./pages/Dashboard";
+import { Dashboard } from "./components/Dashboard";
 import Orders from "./pages/Orders";
-import { Routes as RoutesPage } from "./pages/RoutesPage";
+import { RoutesPage } from "./pages/RoutesPage";
 import { Drivers } from "./pages/Drivers";
 import { Reports } from "./pages/Reports";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
+import { Login } from "./components/Login";
+import { Register } from "./components/Register";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { useAuth } from "./lib/Auth";
 import { Clients } from "./pages/Clients";

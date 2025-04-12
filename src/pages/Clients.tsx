@@ -1,4 +1,4 @@
-// Este componente muestra una lista de clientes y permite agregar, modificar y eliminar clientes. 
+// Este componente muestra una lista de clientes y permite agregar, modificar y eliminar clientes.
 import { useState } from "react";
 import {
   UserCircle,
@@ -12,9 +12,9 @@ import {
   Phone,
 } from "lucide-react";
 import { clients } from "../data/Clientes";
-import ClientForm from "../registros/ClientsForm";
+import { ClientForm } from "../registros/ClientsForm";
 
-// Extendemos la interfaz de cliente para incluir apellido
+// Definimos la estructura del objeto cliente
 interface Client {
   id: number;
   name: string;
@@ -27,11 +27,13 @@ interface Client {
 }
 
 export function Clients() {
+  // Estados locales
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [clientsData, setClientsData] = useState<Client[]>(clients as Client[]);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
 
+  // Filtramos los clientes por nombre, apellido o email
   const filteredClients = clientsData.filter(
     (client) =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -40,6 +42,7 @@ export function Clients() {
         client.apellido.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Maneja el registro de un nuevo cliente
   const handleAddClient = (clientData: {
     name: string;
     apellido: string;
@@ -61,11 +64,13 @@ export function Clients() {
     setClientsData([...clientsData, newClient]);
   };
 
+  // Configura el formulario para editar un cliente existente
   const handleEditClient = (client: Client) => {
     setEditingClient(client);
     setShowForm(true);
   };
 
+  // Elimina un cliente con confirmación previa
   const handleDeleteClient = (clientId: number) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
       setClientsData(clientsData.filter((client) => client.id !== clientId));
@@ -74,7 +79,7 @@ export function Clients() {
 
   return (
     <div className="space-y-6">
-      {/* Título y Botón */}
+      {/* Encabezado y botón para agregar cliente */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-0">
           Clientes
@@ -90,7 +95,7 @@ export function Clients() {
         </button>
       </div>
 
-      {/* Barra de Búsqueda */}
+      {/* Input de búsqueda */}
       <div className="mb-6">
         <div className="relative">
           <input
@@ -104,97 +109,65 @@ export function Clients() {
         </div>
       </div>
 
-      {/* Tabla de Clientes */}
+      {/* Tabla de clientes filtrados */}
       {filteredClients.length > 0 ? (
         <div className="bg-white dark:bg-gray-800 shadow overflow-x-auto sm:overflow-hidden sm:rounded-lg">
           <table className="min-w-full divide-y divide-gray-400 dark:divide-gray-700">
             <thead className="bg-gray-80 dark:bg-gray-700">
               <tr>
-                <th
-                  scope="col"
-                  className="px-3 py-3 text-left pl-15 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider 
-                  whitespace-nowrap"
-                >
+                {/* Cabeceras de tabla */}
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Nombre
                 </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase
-                   tracking-wider whitespace-nowrap"
-                >
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Apellido
                 </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 
-                  uppercase tracking-wider whitespace-nowrap"
-                >
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Email
                 </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 
-                  uppercase tracking-wider whitespace-nowrap"
-                >
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Dirección
                 </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 
-                  uppercase tracking-wider whitespace-nowrap"
-                >
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Teléfono
                 </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3 text-left text-xs font-medium text-gray-500
-                   dark:text-gray-300 uppercase tracking-wider whitespace-nowrap"
-                >
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Eliminar/Editar
                 </th>
               </tr>
             </thead>
-            <tbody
-              className="bg-white divide-y divide-gray-200 dark:bg-gray-800
-             dark:divide-gray-700"
-            >
+            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
               {filteredClients.map((client) => (
                 <tr key={client.id}>
+                  {/* Nombre con ícono */}
                   <td className="px-3 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-8 w-8">
-                        <UserCircle className="h-8 w-8 text-gray-400" />
-                      </div>
-                      <div className="ml-2 sm:ml-4">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {client.name}
-                        </div>
+                      <UserCircle className="h-8 w-8 text-gray-400" />
+                      <div className="ml-2 sm:ml-4 text-sm font-medium text-gray-900 dark:text-white">
+                        {client.name}
                       </div>
                     </div>
                   </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {client.apellido}
-                    </div>
+                  {/* Apellido */}
+                  <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {client.apellido}
                   </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <div className="text-xs sm:text-sm text-gray-900 dark:text-white">
-                      <Mail className="inline h-3 w-3 mr-1" />
-                      {client.contact.email}
-                    </div>
+                  {/* Email */}
+                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white">
+                    <Mail className="inline h-3 w-3 mr-1" />
+                    {client.contact.email}
                   </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <div className="text-xs sm:text-sm text-gray-900 dark:text-white truncate">
-                      <MapPin className="inline h-3 w-3 mr-1" />
-                      {client.address}
-                    </div>
+                  {/* Dirección */}
+                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white truncate">
+                    <MapPin className="inline h-3 w-3 mr-1" />
+                    {client.address}
                   </td>
-                  <td className="px-3 py-4 whitespace-nowrap">
-                    <div className="text-xs sm:text-sm text-gray-900 dark:text-white">
-                      <Phone className="inline h-3 w-3 mr-1" />
-                      {client.contact.phone}
-                    </div>
+                  {/* Teléfono */}
+                  <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white">
+                    <Phone className="inline h-3 w-3 mr-1" />
+                    {client.contact.phone}
                   </td>
+                  {/* Acciones: Editar y Eliminar */}
                   <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                     <button
                       className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 mr-2"
@@ -215,6 +188,7 @@ export function Clients() {
           </table>
         </div>
       ) : (
+        // Si no hay clientes que coincidan
         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
@@ -230,7 +204,7 @@ export function Clients() {
         </div>
       )}
 
-      {/* Formulario Modal */}
+      {/* Formulario Modal para agregar o editar cliente */}
       {showForm && (
         <ClientForm
           onClose={() => {
@@ -239,7 +213,7 @@ export function Clients() {
           }}
           onSubmit={(clientData) => {
             if (editingClient) {
-              // Update existing client
+              // Si estamos editando, actualizamos el cliente
               const updatedClients = clientsData.map((client) =>
                 client.id === editingClient.id
                   ? {
@@ -256,7 +230,7 @@ export function Clients() {
               );
               setClientsData(updatedClients);
             } else {
-              // Add new client
+              // Si no, lo agregamos como nuevo
               handleAddClient(clientData);
             }
             setEditingClient(null);

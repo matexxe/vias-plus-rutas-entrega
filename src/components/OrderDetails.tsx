@@ -29,17 +29,17 @@ export default function OrderDetails({
   >(order.status);
 
   // Formatea fecha para que se muestre como día/mes/año y hora:minutos
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("es-MX", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
+   
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("es-CO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
   // Retorna una clase de Tailwind según el estado para mostrar colores apropiados
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -128,7 +128,7 @@ export default function OrderDetails({
                   </div>
                 )}
 
-                {/* Nombre del conductor, si hay */}
+                {/* Nombre del conductor */}
                 {order.driverName && (
                   <div>
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">

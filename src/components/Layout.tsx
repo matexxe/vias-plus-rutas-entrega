@@ -30,16 +30,8 @@ import {
 // Hooks personalizados: para el tema (oscuro/claro) y autenticación
 import { useTheme } from "./ThemeProvider";
 import { useAuth } from "../lib/Auth";
+import { Notification } from "../interfaces/Interfaces";
 
-// Interfaz para estructurar cada notificación
-interface Notification {
-  id: number;
-  type: string;
-  title: string;
-  message: string;
-  date: string;
-  read: boolean;
-}
 
 // Navegación lateral con rutas e íconos
 const navigation = [

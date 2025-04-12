@@ -5,6 +5,8 @@ import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
 import { Label } from "../UI/Label";
 import { Textarea } from "../UI/Textarea";
+import { Driver } from "../interfaces/Drivers";
+import { OrderDriver } from "../interfaces/OrderDriver";
 import {
   Select,
   SelectContent,
@@ -14,46 +16,33 @@ import {
 } from "../UI/Select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../UI/Dialog";
 
-interface Order {
-  id?: number;
-  orderNumber: string;
-  customerName: string;
-  address: string;
-  details: string;
-  status: "Pendiente" | "En proceso" | "Entregado" | "Cancelado";
-}
-
-interface Driver {
-  id?: number;
-  name: string;
-  vehicle: string;
-  license: string;
-  photo: string;
-  deliveries: number;
-  status: string;
-  rating: number;
-}
-
+// Tipado para las props que recibe el formulario de asignación de órdenes
 interface OrderAssignmentFormProps {
-  onClose: () => void;
-  onSubmit: (orderData: Order) => void;
-  driver: Driver;
-  orderToEdit?: Order;
-  availableOrders?: Order[];
+  onClose: () => void; // Función para cerrar el formulario
+  onSubmit: (orderData: OrderDriver) => void; // Función que se ejecuta al enviar el formulario
+  driver: Driver; // Conductor al que se asignará la orden
+  orderToEdit?: OrderDriver; // Orden a editar (si se está editando)
+  availableOrders?: OrderDriver[]; // Lista de órdenes disponibles para asignar
 }
 
-export default function OrderAssignmentForm({
+// Componente de formulario para asignar o editar una orden de un conductor
+export function OrderAsignarForm({
   onClose,
   onSubmit,
   driver,
   orderToEdit,
   availableOrders = [],
 }: OrderAssignmentFormProps) {
+  // Estado que indica si se está creando una nueva orden (true) o editando una existente (false)
   const [isNewOrder, setIsNewOrder] = useState(!orderToEdit);
+
+  // ID de la orden seleccionada si se elige una de la lista de disponibles
   const [selectedOrderId, setSelectedOrderId] = useState<string>(
     orderToEdit?.id?.toString() || ""
   );
-  const [orderData, setOrderData] = useState<Order>(
+
+  // Estado con los datos del formulario (orden actual)
+  const [orderData, setOrderData] = useState<OrderDriver>(
     orderToEdit || {
       orderNumber: "",
       customerName: "",
@@ -63,31 +52,35 @@ export default function OrderAssignmentForm({
     }
   );
 
+  // Maneja la selección de una orden desde la lista de órdenes disponibles
   const handleOrderSelect = (orderId: string) => {
     if (orderId) {
       const selectedOrder = availableOrders.find(
         (order) => order.id?.toString() === orderId
       );
       if (selectedOrder) {
-        setOrderData(selectedOrder);
+        setOrderData(selectedOrder); // Carga los datos de la orden seleccionada
       }
-      setSelectedOrderId(orderId);
+      setSelectedOrderId(orderId); // Guarda el ID seleccionado
     }
   };
 
+  // Maneja los cambios en los campos del formulario
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     const { name, value } = e.target;
-    setOrderData((prev) => ({ ...prev, [name]: value }));
+    setOrderData((prev) => ({ ...prev, [name]: value })); // Actualiza el estado con el nuevo valor
   };
 
+  // Maneja el envío del formulario
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(orderData);
+    e.preventDefault(); // Previene el comportamiento por defecto del formulario
+    onSubmit(orderData); // Ejecuta la función pasada por props con los datos de la orden
   };
+
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -246,7 +239,7 @@ export default function OrderAssignmentForm({
               onValueChange={(value) =>
                 setOrderData((prev) => ({
                   ...prev,
-                  status: value as Order["status"],
+                  status: value as OrderDriver["status"],
                 }))
               }
             >

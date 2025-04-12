@@ -1,20 +1,21 @@
-// Aqui se define el formulario para crear y editar pedidos. 
+// Formulario para crear y editar pedidos
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-// Aqui se define el formulario para crear pedidos.
+
+// Props del componente OrderForm
 interface OrderFormProps {
   onClose: () => void;
   onSubmit: (orderData: {
     cliente: string;
     direccion: string;
-    estatus: "Pendiente" | "En progreso" | "Entregado/a" | "Cancelado" ;
+    estatus: "Pendiente" | "En progreso" | "Entregado/a" | "Cancelado";
     fecha: string;
     articulo: string;
     telefono: string;
     email: string;
     detalles: string;
   }) => void;
-  // Aqui se editan los pedidos existentes. 
+  // Datos iniciales para modo edición (opcional)
   initialData?: {
     id: string;
     cliente: string;
@@ -28,11 +29,12 @@ interface OrderFormProps {
   };
 }
 
-export default function OrderForm({
+export function OrderForm({
   onClose,
   onSubmit,
   initialData,
 }: OrderFormProps) {
+  // Estado del formulario
   const [formData, setFormData] = useState({
     cliente: "",
     direccion: "",
@@ -48,7 +50,7 @@ export default function OrderForm({
     detalles: "",
   });
 
-  // Cargar datos iniciales si se proporcionan (para edición)
+  // Si hay datos iniciales (modo edición), cargarlos al estado
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -64,6 +66,7 @@ export default function OrderForm({
     }
   }, [initialData]);
 
+  // Manejar cambios en los inputs
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -76,6 +79,7 @@ export default function OrderForm({
     }));
   };
 
+  // Enviar formulario
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -84,6 +88,7 @@ export default function OrderForm({
   return (
     <div className="fixed inset-0 bg-white/30 dark:bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        {/* Encabezado del formulario */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {initialData ? "Editar pedido" : "Agregar nuevo pedido"}
@@ -95,8 +100,11 @@ export default function OrderForm({
             <X className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Formulario */}
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            {/* Campo: Cliente */}
             <div>
               <label
                 htmlFor="cliente"
@@ -114,6 +122,8 @@ export default function OrderForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
+
+            {/* Campo: Teléfono */}
             <div>
               <label
                 htmlFor="telefono"
@@ -130,6 +140,8 @@ export default function OrderForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
+
+            {/* Campo: Email */}
             <div>
               <label
                 htmlFor="email"
@@ -146,6 +158,8 @@ export default function OrderForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
+
+            {/* Campo: Dirección */}
             <div>
               <label
                 htmlFor="direccion"
@@ -163,6 +177,8 @@ export default function OrderForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
+
+            {/* Campo: Artículo */}
             <div>
               <label
                 htmlFor="articulo"
@@ -180,6 +196,8 @@ export default function OrderForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
+
+            {/* Campo: Fecha */}
             <div>
               <label
                 htmlFor="fecha"
@@ -197,6 +215,8 @@ export default function OrderForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
+
+            {/* Campo: Estatus */}
             <div>
               <label
                 htmlFor="estatus"
@@ -219,6 +239,8 @@ export default function OrderForm({
               </select>
             </div>
           </div>
+
+          {/* Campo: Detalles del pedido */}
           <div className="mb-4">
             <label
               htmlFor="detalles"
@@ -236,6 +258,8 @@ export default function OrderForm({
               placeholder="Instrucciones especiales, detalles de entrega, etc."
             ></textarea>
           </div>
+
+          {/* Botones */}
           <div className="flex justify-end space-x-3">
             <button
               type="button"

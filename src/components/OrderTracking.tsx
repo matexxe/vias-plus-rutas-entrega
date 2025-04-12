@@ -1,10 +1,47 @@
-import { useState, useEffect } from "react"; // Importamos los estados y efectos de react
-import { Search, Filter, MapPin, Package, Truck,  CheckCircle, AlertCircle, Clock } from "lucide-react"; // Iconos para mejorar la interfaz
-import { ordersData as initialOrders, type Order } from "../data/OrdersData"; // Datos simulados que se obtienen en el archivo Data.
-import OrderDetails from "../components/OrderDetails"; // Componente que muestra los detalles de un pedido especifico.
+import { useState, useEffect } from "react";
+/* 
+   Hooks de React:
+  - useState: para manejar el estado local del componente.
+  - useEffect: para manejar efectos secundarios como temporizadores o llamadas automáticas.
+*/
+
+import {
+  Search,
+  Filter,
+  MapPin,
+  Package,
+  Truck,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+} from "lucide-react";
+/* 
+   Iconos importados desde Lucide React para representar
+    visualmente los estados de los pedidos.
+*/
+
+import { ordersData as initialOrders, type Order } from "../data/OrdersData";
+/* 
+     Datos simulados de pedidos y su tipo. 
+  - `ordersData`: lista de pedidos de prueba.
+  - `Order`: tipo TypeScript para asegurar la estructura de los pedidos.
+*/
+
+import OrderDetails from "../components/OrderDetails";
+/* 
+ Componente que muestra los detalles de un pedido específico cuando se selecciona.
+*/
 
 export function OrderTracking() {
-  // Estados principales del componente
+  /* 
+      Definición de estados del componente principal:
+    - orders: lista completa de pedidos.
+    - filteredOrders: lista filtrada según búsqueda o estado.
+    - searchTerm: valor ingresado por el usuario en la búsqueda.
+    - statusFilter: filtro de estado ("todos", "entregado", etc.).
+    - selectedOrder: pedido seleccionado por el usuario.
+    - showDetails: booleano que controla si se muestran los detalles.
+  */
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(initialOrders);
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,13 +49,17 @@ export function OrderTracking() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  // Simulación de actualizaciones automáticas de estado de pedidos
+  /* 
+      useEffect que simula cambios automáticos en el estado de los pedidos.
+    - Cada 5 segundos intenta:
+      • Marcar pedidos "En tránsito" como "Entregado" (con 10% de probabilidad).
+      • Pasar pedidos "En preparación" a "En tránsito" (con 5% de probabilidad), asignando un conductor aleatorio.
+  */
   useEffect(() => {
     const interval = setInterval(() => {
       setOrders((prevOrders) => {
         const newOrders = [...prevOrders];
 
-        // Buscar pedidos "En tránsito" para posiblemente marcarlos como "Entregado"
         const transitOrders = newOrders.filter(
           (order) => order.status === "En tránsito"
         );
@@ -26,7 +67,6 @@ export function OrderTracking() {
           const randomIndex = Math.floor(Math.random() * transitOrders.length);
           const orderToUpdate = transitOrders[randomIndex];
 
-          // 10% de probabilidad de marcar como entregado
           if (Math.random() < 0.1) {
             const orderIndex = newOrders.findIndex(
               (o) => o.id === orderToUpdate.id
@@ -40,7 +80,6 @@ export function OrderTracking() {
           }
         }
 
-        // Buscar pedidos "En preparación" para posiblemente pasarlos a "En tránsito"
         const prepOrders = newOrders.filter(
           (order) => order.status === "En preparación"
         );
@@ -52,7 +91,6 @@ export function OrderTracking() {
           );
 
           if (orderIndex !== -1) {
-            // Asignar conductor aleatorio
             const driverIds = [1, 2, 3];
             const driverNames = ["Juan Pérez", "Luis Ramírez", "Miguel Torres"];
             const randomDriverIndex = Math.floor(
@@ -70,21 +108,24 @@ export function OrderTracking() {
 
         return newOrders;
       });
-    }, 5000); // Cada 5 segundos
+    }, 5000);
 
-    return () => clearInterval(interval); // Limpieza del intervalo
+    return () => clearInterval(interval); //  Limpieza del intervalo al desmontar el componente
   }, []);
 
-  // Filtrado por búsqueda y estado
+  /* 
+      useEffect para aplicar filtros:
+    - Filtra por estado seleccionado si no es "all".
+    - Filtra por término de búsqueda (cliente, dirección, ciudad, tipo de negocio, conductor).
+    - Actualiza `filteredOrders` cada vez que cambian los filtros o los pedidos.
+  */
   useEffect(() => {
     let result = orders;
 
-    // Filtro por estado
     if (statusFilter !== "all") {
       result = result.filter((order) => order.status === statusFilter);
     }
 
-    // Filtro por término de búsqueda
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
@@ -101,13 +142,17 @@ export function OrderTracking() {
     setFilteredOrders(result);
   }, [orders, searchTerm, statusFilter]);
 
-  // Mostrar detalles del pedido seleccionado
+  /*
+    Función para seleccionar un pedido y mostrar sus detalles.
+  */
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setShowDetails(true);
   };
 
-  // Icono por estado del pedido
+  /*
+     Devuelve un ícono representativo según el estado del pedido.
+  */
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "Pendiente":
@@ -125,7 +170,10 @@ export function OrderTracking() {
     }
   };
 
-  // Color de fondo según estado del pedido
+  /* 
+     Devuelve clases de color de fondo y texto según el estado del pedido.
+    Estas clases se usan para mostrar una etiqueta visual con colores representativos.
+  */
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Pendiente":
@@ -143,18 +191,22 @@ export function OrderTracking() {
     }
   };
 
-  // Formateo de fecha para visualización
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("es-MX", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
+  /* 
+      Formatea una fecha para mostrarla en formato local legible:
+    - Día, mes y año con 2 dígitos.
+    - Hora y minutos con formato 24h.
+    - Formato localizado para México en español (es-MX).
+  */
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("es-CO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
   return (
     <div className="container px-4">
       {/* Título */}

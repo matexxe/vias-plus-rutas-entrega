@@ -1,3 +1,6 @@
+// Se traduce el texto de las instrucciones de navegacion al espanol. 
+
+
 export const translations: Record<string, string> = {
   Head: "Dirígete",
   Continue: "Continúa",

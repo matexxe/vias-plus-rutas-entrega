@@ -1,28 +1,20 @@
-// Aqui se define el formulario para registrar y editar conductores. 
+// Formulario para registrar o editar información de conductores.
 import { useState, useRef, useEffect } from "react";
+import { Driver } from "../interfaces/Drivers";
 
-interface Driver {
-  id?: number;
-  name: string;
-  vehicle: string;
-  license: string;
-  photo: string;
-  deliveries: number;
-  status: string;
-  rating: number;
-}
-
+// Props que recibe el formulario
 interface DriverFormProps {
-  onClose: () => void;
-  onSubmit: (driver: Driver) => void;
-  driverToEdit?: Driver;
+  onClose: () => void; // Función para cerrar el formulario
+  onSubmit: (driver: Driver) => void; // Función que se ejecuta al enviar el formulario
+  driverToEdit?: Driver; // Conductor a editar (opcional)
 }
 
-export default function DriverForm({
+export function DriverForm({
   onClose,
   onSubmit,
   driverToEdit,
 }: DriverFormProps) {
+  // Estado local para los datos del formulario
   const [formData, setFormData] = useState<Driver>({
     name: "",
     vehicle: "",
@@ -32,19 +24,27 @@ export default function DriverForm({
     status: "Disponible",
     rating: 0,
   });
+
+  // Estado para mostrar errores en la calificación
   const [ratingError, setRatingError] = useState("");
+
+  // Referencia al input de archivo
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Si se está editando un conductor, precargar sus datos
   useEffect(() => {
     if (driverToEdit) {
       setFormData(driverToEdit);
     }
   }, [driverToEdit]);
 
+  // Manejo del cambio en los inputs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    // Validación en tiempo real para la calificación
     if (name === "rating") {
       const ratingValue = Number.parseFloat(value);
       if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
@@ -53,12 +53,15 @@ export default function DriverForm({
         setRatingError("");
       }
     }
+
+    // Actualización del estado
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  // Manejo del cambio de imagen (foto del conductor)
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -73,32 +76,39 @@ export default function DriverForm({
     }
   };
 
+  // Envío del formulario
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validación de la calificación
     const ratingValue = Number.parseFloat(formData.rating.toString());
     if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
       setRatingError("La calificación debe ser un número entre 1 y 5");
       return;
     }
-    onSubmit(formData);
-    onClose();
+
+    onSubmit(formData); // Enviar los datos
+    onClose(); // Cerrar el modal
   };
 
   return (
     <div className="fixed inset-0 bg-black/20 dark:bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+        {/* Botón de cerrar */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        >
-        </button>
+        ></button>
 
+        {/* Título del formulario */}
         <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
           {driverToEdit ? "Editar conductor" : "Agregar nuevo conductor"}
         </h2>
 
+        {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Campo: Nombre */}
             <div>
               <label
                 htmlFor="name"
@@ -117,6 +127,7 @@ export default function DriverForm({
               />
             </div>
 
+            {/* Campo: Vehículo */}
             <div>
               <label
                 htmlFor="vehicle"
@@ -135,6 +146,7 @@ export default function DriverForm({
               />
             </div>
 
+            {/* Campo: Licencia */}
             <div>
               <label
                 htmlFor="license"
@@ -153,6 +165,7 @@ export default function DriverForm({
               />
             </div>
 
+            {/* Campo: Entregas totales */}
             <div>
               <label
                 htmlFor="deliveries"
@@ -170,6 +183,7 @@ export default function DriverForm({
               />
             </div>
 
+            {/* Campo: Estatus */}
             <div>
               <label
                 htmlFor="status"
@@ -192,6 +206,7 @@ export default function DriverForm({
               </select>
             </div>
 
+            {/* Campo: Calificación */}
             <div>
               <label
                 htmlFor="rating"
@@ -216,6 +231,7 @@ export default function DriverForm({
             </div>
           </div>
 
+          {/* Campo: Foto de perfil */}
           <div>
             <label
               htmlFor="photo"
@@ -250,6 +266,7 @@ export default function DriverForm({
             </div>
           </div>
 
+          {/* Botones de acción */}
           <div className="flex justify-end space-x-3 pt-4">
             <button
               type="button"

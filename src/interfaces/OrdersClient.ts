@@ -1,4 +1,4 @@
-export interface Order {
+export interface OrdersClient {
   id: string;
   cliente: string;
   direccion: string;

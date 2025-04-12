@@ -1,114 +1,77 @@
-
 import { useState } from "react";
 import { Plus, Edit, Package, Trash2 } from "lucide-react";
 import { driversData as initialDrivers } from "../data/DriversData";
-import DriverForm from "../registros/DriverForm";
-import OrderAssignmentForm from "../registros/OrderAsignar";
+import { DriverForm } from "../registros/DriverForm";
+import { OrderAsignarForm } from "../registros/OrderAsignar";
+import { Driver } from "../interfaces/Drivers";
+import { OrderDriver } from "../interfaces/OrderDriver";
+import { sampleOrders } from "../data/SampleOrders";
 
-// Tipado de los conductores. 
-interface Driver {
-  id?: number;
-  name: string;
-  vehicle: string;
-  license: string;
-  photo: string;
-  deliveries: number;
-  status: string;
-  rating: number;
-}
-// Tipado  de los pedidos. 
-interface Order {
-  id?: number;
-  orderNumber: string;
-  customerName: string;
-  address: string;
-  details: string;
-  status: "Pendiente" | "En proceso" | "Entregado" | "Cancelado";
-  driverId?: number;
-}
-
-//Datos simulados de pedidos de muestra. 
-const sampleOrders: Order[] = [
-  {
-    id: 1,
-    orderNumber: "ORD-001",
-    customerName: "Juan Pérez",
-    address: "Calle Principal 123",
-    details: "2 cajas grandes",
-    status: "Pendiente",
-  },
-  {
-    id: 2,
-    orderNumber: "ORD-002",
-    customerName: "María López",
-    address: "Avenida Central 456",
-    details: "Frágil, manipular con cuidado",
-    status: "Pendiente",
-  },
-  {
-    id: 3,
-    orderNumber: "ORD-003",
-    customerName: "Carlos Rodríguez",
-    address: "Plaza Mayor 789",
-    details: "Entrega urgente",
-    status: "Pendiente",
-  },
-];
-//Esta funcion es la escargada de mostrar la pagina de conductores. 
+// Página principal de gestión de conductores
 export function Drivers() {
+  // Estados para controlar visibilidad de formularios
   const [showForm, setShowForm] = useState(false);
   const [showOrderForm, setShowOrderForm] = useState(false);
-  const [drivers, setDrivers] = useState<Driver[]>(
-    initialDrivers.map((driver) => ({
-      ...driver,
-      rating: Number(driver.rating) || 0,
-    }))
-  );
+
+  // Lista de conductores con rating
+  const [drivers, setDrivers] = useState<Driver[]>(initialDrivers);
+
+
+  // Estado para saber si estamos editando un conductor
   const [driverToEdit, setDriverToEdit] = useState<Driver | undefined>(
     undefined
   );
+
+  // Estado para saber a qué conductor se le va a asignar un pedido
   const [selectedDriver, setSelectedDriver] = useState<Driver | undefined>(
     undefined
   );
-  const [orders, setOrders] = useState<Order[]>(sampleOrders);
-  const [orderToEdit, setOrderToEdit] = useState<Order | undefined>(undefined);
 
+  // Lista de pedidos actuales
+  const [orders, setOrders] = useState<OrderDriver[]>(sampleOrders);
+
+  // Pedido que se va a editar (si aplica)
+  const [orderToEdit, setOrderToEdit] = useState<OrderDriver | undefined>(
+    undefined
+  );
+
+  // Añadir o actualizar un conductor
   const handleAddOrUpdateDriver = (driverData: Driver) => {
     if (driverToEdit) {
-      // Actualiza un conductor existente. 
+      //  Actualiza solo el conductor cuyo id coincida
       setDrivers(
-        drivers.map((driver) =>
-          driver.id === driverToEdit.id ? { ...driver, ...driverData } : driver
+        drivers.map((d) =>
+          d.id === driverToEdit.id ? { ...d, ...driverData } : d
         )
       );
-      setDriverToEdit(undefined);
+      setDriverToEdit(undefined); // Limpiar el estado tras edición
     } else {
-      // Agrega un nuevo conductor. 
+      // Agregar nuevo conductor
       const newDriver: Driver = {
         ...driverData,
         id: drivers.length + 1,
-        rating: Number(driverData.rating) || 0,
       };
       setDrivers([...drivers, newDriver]);
     }
-    setShowForm(false);
+    setShowForm(false); // Cerrar el formulario
   };
 
+  // Prepara edición de conductor
   const handleEditDriver = (driver: Driver) => {
     setDriverToEdit(driver);
     setShowForm(true);
   };
 
+  // Elimina conductor y desasigna pedidos relacionados
   const handleDeleteDriver = (driverId?: number) => {
     if (!driverId) return;
 
     if (
       window.confirm("¿Estás seguro de que deseas eliminar este conductor?")
     ) {
-      // Remove the driver
       setDrivers(drivers.filter((driver) => driver.id !== driverId));
 
-      // Actualiza cualquier pedido asignado al conductor. 
+      // Desasigna cualquier pedido relacionado al conductor eliminado
       setOrders(
         orders.map((order) =>
           order.driverId === driverId
@@ -119,30 +82,32 @@ export function Drivers() {
     }
   };
 
+  // Inicia el proceso para asignar pedido a conductor
   const handleAssignOrder = (driver: Driver) => {
     setSelectedDriver(driver);
     setOrderToEdit(undefined);
     setShowOrderForm(true);
   };
 
-  const handleAddOrUpdateOrder = (orderData: Order) => {
+  // Añadir o actualizar un pedido
+  const handleAddOrUpdateOrder = (orderData: OrderDriver) => {
     if (orderToEdit) {
-      // Actualiza un pedido existente. 
+      // Actualiza pedido existente
       setOrders(
         orders.map((order) =>
           order.id === orderToEdit.id ? { ...order, ...orderData } : order
         )
       );
     } else {
-      // Agrega un nuevo pedido. 
-      const newOrder: Order = {
+      // Agrega nuevo pedido con ID y conductor asignado
+      const newOrder: OrderDriver = {
         ...orderData,
         id: orders.length + 1,
         driverId: selectedDriver?.id,
       };
       setOrders([...orders, newOrder]);
 
-      // Actualiza el estado del conductor en ruta si esta disponible.
+      // Si el conductor estaba disponible, actualizar a "En ruta"
       if (selectedDriver && selectedDriver.status === "Disponible") {
         setDrivers(
           drivers.map((driver) =>
@@ -153,12 +118,14 @@ export function Drivers() {
         );
       }
     }
+
+    // Limpiar estados y cerrar formulario
     setShowOrderForm(false);
     setSelectedDriver(undefined);
     setOrderToEdit(undefined);
   };
 
-  // Verifica si un pedido puede ser asignado a un conductor. 
+  // Obtiene solo pedidos disponibles para asignar
   const getAvailableOrders = () => {
     return orders.filter(
       (order) =>
@@ -168,7 +135,7 @@ export function Drivers() {
     );
   };
 
-  // Asigna un pedido a un conductor. 
+  // Obtiene los pedidos asignados a un conductor específico
   const getDriverOrders = (driverId?: number) => {
     return orders.filter((order) => order.driverId === driverId);
   };
@@ -176,6 +143,7 @@ export function Drivers() {
   return (
     <div className="container -mt-2">
       <div className="space-y-6">
+        {/* Encabezado y botón para agregar conductor */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
             Conductores
@@ -192,6 +160,7 @@ export function Drivers() {
           </button>
         </div>
 
+        {/* Lista de conductores */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {drivers.map((driver) => (
             <div
@@ -199,16 +168,15 @@ export function Drivers() {
               className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow"
             >
               <div className="p-6">
+                {/* Información principal del conductor */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700">
-                        <img
-                          src={driver.photo || "/placeholder.svg"}
-                          alt={`${driver.name} profile`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
+                    <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                      <img
+                        src={driver.photo || "/placeholder.svg"}
+                        alt={`${driver.name} profile`}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                     <div className="ml-4">
                       <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -229,69 +197,72 @@ export function Drivers() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Acciones */}
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handleAssignOrder(driver)}
-                      className="text-primary hover:text-primary-600 focus:outline-none"
                       title="Asignar pedido"
+                      className="text-primary hover:text-primary-600"
                     >
                       <Package className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => handleEditDriver(driver)}
-                      className="text-primary hover:text-primary-600 focus:outline-none"
                       title="Editar conductor"
+                      className="text-primary hover:text-primary-600"
                     >
                       <Edit className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => handleDeleteDriver(driver.id)}
-                      className="text-red-500 hover:text-red-700 focus:outline-none"
                       title="Eliminar conductor"
+                      className="text-red-500 hover:text-red-700"
                     >
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
                 </div>
 
+                {/* Datos del conductor */}
                 <div className="mt-6">
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-4">
-                    <div className="sm:col-span-1">
+                    <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         Vehículo
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      <dd className="text-sm text-gray-900 dark:text-white">
                         {driver.vehicle}
                       </dd>
                     </div>
-                    <div className="sm:col-span-1">
+                    <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         Licencia
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      <dd className="text-sm text-gray-900 dark:text-white">
                         {driver.license}
                       </dd>
                     </div>
-                    <div className="sm:col-span-1">
+                    <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         Entregas totales
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      <dd className="text-sm text-gray-900 dark:text-white">
                         {driver.deliveries}
                       </dd>
                     </div>
-                    <div className="sm:col-span-1">
+                    <div>
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         Calificación
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                        ⭐ {Number(driver.rating).toFixed(1)}
+                      <dd className="text-sm text-gray-900 dark:text-white">
+                        ⭐ {driver.rating}
                       </dd>
                     </div>
                   </dl>
                 </div>
 
-                {/* Asignar pedidos */}
+                {/* Lista de pedidos asignados */}
                 {getDriverOrders(driver.id).length > 0 && (
                   <div className="mt-4 border-t pt-4">
                     <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -332,6 +303,7 @@ export function Drivers() {
         </div>
       </div>
 
+      {/* Modal para formulario de conductor */}
       {showForm && (
         <DriverForm
           onClose={() => {
@@ -343,8 +315,9 @@ export function Drivers() {
         />
       )}
 
+      {/* Modal para asignación de pedido */}
       {showOrderForm && selectedDriver && (
-        <OrderAssignmentForm
+        <OrderAsignarForm
           onClose={() => {
             setShowOrderForm(false);
             setSelectedDriver(undefined);

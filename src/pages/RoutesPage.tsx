@@ -6,6 +6,9 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import { Location } from "../interfaces/Location";
+import { RouteDetails } from "../interfaces/RouteDetails";
+import { Stop } from "../interfaces/Stop";
 import { translations } from "../Traduccion/Translations";
 
 // Leaflet icon workaround
@@ -18,31 +21,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png",
 });
-
-interface Stop {
-  id: string;
-  address: string;
-  city: string;
-  type: "store" | "restaurant" | "pharmacy" | "supermarket";
-  time: string;
-  coordinates: [number, number];
-}
-
-interface RouteDetails {
-  totalDistance: number;
-  totalTime: number;
-  stops: number;
-  isCalculating: boolean;
-  error?: string;
-  instructions?: string[];
-}
-
-interface Location {
-  latitude: number;
-  longitude: number;
-  address: string;
-  city: string;
-}
 
 function translateRouteInstructions(instruction: string): string {
   // Reemplazar palabras y frases conocidas
@@ -69,7 +47,7 @@ function translateRouteInstructions(instruction: string): string {
   return translatedText;
 }
 
-export function Routes() {
+export function RoutesPage() {
   const [stops, setStops] = useState<Stop[]>([]);
   const [newStop, setNewStop] = useState({
     address: "",
@@ -117,7 +95,7 @@ export function Routes() {
                 '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(mapRef.current);
 
-            // Add CSS to fix z-index issues with Leaflet controls
+            // Agrega css a la hoja de estilos para evitar que el mapa se superponga a los controles.
             const style = document.createElement("style");
             style.textContent = `
               .leaflet-control { z-index: 0 !important; }

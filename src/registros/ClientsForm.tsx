@@ -20,7 +20,7 @@ interface ClientFormProps {
   };
 }
 
-export default function ClientForm({
+export function ClientForm({
   onClose,
   onSubmit,
   initialData,
@@ -33,7 +33,7 @@ export default function ClientForm({
     phone: "",
   });
 
-  // Load initial data if provided (for editing)
+  // Carga los datos iniciales si existen
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);

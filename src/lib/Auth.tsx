@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+// Definición de la interfaz para el usuario (tienda) autenticado
 interface User {
   id: string;
   email: string;
@@ -8,6 +9,7 @@ interface User {
   businessType: "store" | "restaurant" | "pharmacy";
 }
 
+// Estado y acciones relacionadas con la autenticación
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -18,7 +20,7 @@ interface AuthState {
   logout: () => void;
 }
 
-// Usuarios de prueba
+// Base de datos simulada en memoria para usuarios de prueba
 const mockUsers: (User & { password: string })[] = [
   {
     id: "1",
@@ -36,11 +38,19 @@ const mockUsers: (User & { password: string })[] = [
   },
 ];
 
+// Hook personalizado de Zustand para manejar la autenticación
 export const useAuth = create<AuthState>()(
+  // Persistencia del estado en localStorage (clave: "auth-storage")
   persist(
     (set) => ({
       user: null,
       isAuthenticated: false,
+
+      /**
+       * Inicia sesión con un email y contraseña.
+       * Busca en la lista de usuarios simulada (mockUsers).
+       * Lanza un error si las credenciales no coinciden.
+       */
       login: async (email: string, password: string) => {
         const user = mockUsers.find(
           (u) => u.email === email && u.password === password
@@ -50,9 +60,16 @@ export const useAuth = create<AuthState>()(
           throw new Error("Credenciales inválidas");
         }
 
+        // Se excluye la contraseña del objeto almacenado en el estado
         const { password: _, ...userData } = user;
         set({ user: userData, isAuthenticated: true });
       },
+
+      /**
+       * Registra un nuevo usuario.
+       * Verifica que no exista ya uno con el mismo correo.
+       * Almacena el nuevo usuario en la lista simulada y actualiza el estado.
+       */
       register: async (userData) => {
         const exists = mockUsers.some((u) => u.email === userData.email);
 
@@ -70,12 +87,16 @@ export const useAuth = create<AuthState>()(
         mockUsers.push({ ...newUser, password: userData.password });
         set({ user: newUser, isAuthenticated: true });
       },
+
+      /**
+       * Cierra la sesión, eliminando el usuario del estado.
+       */
       logout: () => {
         set({ user: null, isAuthenticated: false });
       },
     }),
     {
-      name: "auth-storage",
+      name: "auth-storage", // Nombre de la clave para localStorage
     }
   )
 );
