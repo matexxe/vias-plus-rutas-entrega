@@ -30,7 +30,8 @@ npm run dev
 6.	El sistema puede calcular la dirección del pedido a entregar, da unas instrucciones para la eficiencia de la entrega.
 7.	El sistema permite registrar, consultar, eliminar y actualizar conductores en tiempo real. También se le permite al administrador asignarle pedidos. 
 8.	El sistema permite generar reportes para analizar eficiencia y métricas de entregas. 
-9.	El sistema permite una configuración donde pueden verse las notificaciones. Se permite eliminar reportes y seguir el historial de los últimos pedidos. 
+9.	El sistema permite una configuración donde pueden verse las notificaciones. Se permite eliminar reportes y seguir el historial de los últimos pedidos.
+
 
 ## Lista de requerimientos no funcionales:
 
@@ -38,3 +39,11 @@ npm run dev
 2.	Cuenta con un panel lateral donde están las herramientas del sistema. 
 
 *Esto es importante:* Todos los datos son simulados. Solo es prueba ya que no he encontrado como ponerlo en produccion en la vida real. 
+
+
+
+## Tecnologias usadas:
+
+* TypeScript
+* React
+* Tailwind
