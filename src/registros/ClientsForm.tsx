@@ -1,22 +1,22 @@
-// Aqui es el formulario para crear y editar clientes. 
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 interface ClientFormProps {
   onClose: () => void;
   onSubmit: (clientData: {
-    name: string;
+    nombre: string;
     apellido: string;
-    address: string;
+    direccion: string;
     email: string;
-    phone: string;
+    telefono: string;
   }) => void;
   initialData?: {
-    name: string;
+    _id?: string;
+    nombre: string;
     apellido: string;
-    address: string;
+    direccion: string;
     email: string;
-    phone: string;
+    telefono: string;
   };
 }
 
@@ -26,14 +26,13 @@ export function ClientForm({
   initialData,
 }: ClientFormProps) {
   const [formData, setFormData] = useState({
-    name: "",
+    nombre: "",
     apellido: "",
-    address: "",
+    direccion: "",
     email: "",
-    phone: "",
+    telefono: "",
   });
 
-  // Carga los datos iniciales si existen
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
@@ -51,7 +50,6 @@ export function ClientForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
-    onClose();
   };
 
   return (
@@ -72,16 +70,16 @@ export function ClientForm({
           <div className="space-y-4">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="nombre"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Nombre:
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="nombre"
+                name="nombre"
+                value={formData.nombre}
                 onChange={handleChange}
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -123,16 +121,16 @@ export function ClientForm({
             </div>
             <div>
               <label
-                htmlFor="phone"
+                htmlFor="telefono"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Teléfono:
               </label>
               <input
                 type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
+                id="telefono"
+                name="telefono"
+                value={formData.telefono}
                 onChange={handleChange}
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -140,16 +138,16 @@ export function ClientForm({
             </div>
             <div>
               <label
-                htmlFor="address"
+                htmlFor="direccion"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Dirección:
               </label>
               <input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="direccion"
+                name="direccion"
+                value={formData.direccion}
                 onChange={handleChange}
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"

@@ -1,72 +1,74 @@
-// Formulario para crear y editar pedidos
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
-// Props del componente OrderForm
 interface OrderFormProps {
   onClose: () => void;
   onSubmit: (orderData: {
-    cliente: string;
-    direccion: string;
-    estatus: "Pendiente" | "En progreso" | "Entregado/a" | "Cancelado";
-    fecha: string;
+    cliente_id: string;
     articulo: string;
+    descripcionPedido: string;
+    fechaEntrega: string;
+    estatus: string;
     telefono: string;
-    email: string;
-    detalles: string;
-  }) => void;
-  // Datos iniciales para modo edición (opcional)
-  initialData?: {
-    id: string;
-    cliente: string;
     direccion: string;
-    estatus: "Pendiente" | "En progreso" | "Entregado/a" | "Cancelado";
-    fecha: string;
+    email: string;
+    conductor_id?: string | null;
+  }) => void;
+  initialData?: {
+    _id?: string;
+    cliente_id: string;
     articulo: string;
-    telefono?: string;
-    email?: string;
-    detalles?: string;
+    descripcionPedido: string;
+    fechaEntrega: string;
+    estatus: string;
+    telefono: string;
+    direccion: string;
+    email: string;
+    conductor_id?: string | null;
+    conductor?: { _id: string; nombre: string };
   };
+  drivers?: Array<{ _id: string; nombre: string }>;
 }
 
 export function OrderForm({
   onClose,
   onSubmit,
   initialData,
+  drivers,
 }: OrderFormProps) {
-  // Estado del formulario
   const [formData, setFormData] = useState({
-    cliente: "",
-    direccion: "",
-    estatus: "Pendiente" as
-      | "Pendiente"
-      | "En progreso"
-      | "Entregado/a"
-      | "Cancelado",
-    fecha: new Date().toISOString().split("T")[0], // Fecha actual en formato YYYY-MM-DD
+    cliente_id: "",
     articulo: "",
+    descripcionPedido: "",
+    fechaEntrega: "",
+    estatus: "pendiente",
     telefono: "",
+    direccion: "",
     email: "",
-    detalles: "",
+    conductor_id: null as string | null,
   });
 
-  // Si hay datos iniciales (modo edición), cargarlos al estado
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        cliente: initialData.cliente || "",
-        direccion: initialData.direccion || "",
-        estatus: initialData.estatus || "Pendiente",
-        fecha: initialData.fecha || new Date().toISOString().split("T")[0],
-        articulo: initialData.articulo || "",
-        telefono: initialData.telefono || "",
-        email: initialData.email || "",
-        detalles: initialData.detalles || "",
-      });
-    }
-  }, [initialData]);
+useEffect(() => {
+  if (initialData) {
+    const fechaEntrega = initialData.fechaEntrega
+      ? new Date(initialData.fechaEntrega).toISOString().slice(0, 16)
+      : "";
+    setFormData({
+      cliente_id: initialData.cliente_id || "",
+      articulo: initialData.articulo || "",
+      descripcionPedido: initialData.descripcionPedido || "",
+      fechaEntrega,
+      estatus: initialData.estatus || "pendiente",
+      telefono: initialData.telefono || "",
+      direccion: initialData.direccion || "",
+      email: initialData.email || "",
+      conductor_id:
+        initialData.conductor_id || initialData.conductor?._id || null,
+    });
+  }
+}, [initialData]);
 
-  // Manejar cambios en los inputs
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -79,19 +81,21 @@ export function OrderForm({
     }));
   };
 
-  // Enviar formulario
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const dataToSubmit = {
+      ...formData,
+      conductor_id: formData.conductor_id || null,
+    };
+    onSubmit(dataToSubmit);
   };
 
   return (
     <div className="fixed inset-0 bg-white/30 dark:bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Encabezado del formulario */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {initialData ? "Editar pedido" : "Agregar nuevo pedido"}
+            {initialData ? "Editar pedido" : "Crear nuevo pedido"}
           </h2>
           <button
             onClick={onClose}
@@ -100,95 +104,27 @@ export function OrderForm({
             <X className="h-5 w-5" />
           </button>
         </div>
-
-        {/* Formulario */}
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            {/* Campo: Cliente */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label
-                htmlFor="cliente"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Nombre del cliente*
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                ID cliente
               </label>
               <input
                 type="text"
-                id="cliente"
-                name="cliente"
-                value={formData.cliente}
+                name="cliente_id"
+                value={formData.cliente_id}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-
-            {/* Campo: Teléfono */}
             <div>
-              <label
-                htmlFor="telefono"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Teléfono de contacto*
-              </label>
-              <input
-                type="tel"
-                id="telefono"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
-
-            {/* Campo: Email */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Email*
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
-
-            {/* Campo: Dirección */}
-            <div>
-              <label
-                htmlFor="direccion"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Dirección de entrega*
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Artículo
               </label>
               <input
                 type="text"
-                id="direccion"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
-
-            {/* Campo: Artículo */}
-            <div>
-              <label
-                htmlFor="articulo"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Artículo/Producto*
-              </label>
-              <input
-                type="text"
-                id="articulo"
                 name="articulo"
                 value={formData.articulo}
                 onChange={handleChange}
@@ -196,71 +132,112 @@ export function OrderForm({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-
-            {/* Campo: Fecha */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Descripción
+              </label>
+              <textarea
+                name="descripcionPedido"
+                value={formData.descripcionPedido}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
             <div>
-              <label
-                htmlFor="fecha"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Fecha de entrega*
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Fecha de entrega
               </label>
               <input
-                type="date"
-                id="fecha"
-                name="fecha"
-                value={formData.fecha}
+                type="datetime-local"
+                name="fechaEntrega"
+                value={formData.fechaEntrega}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-
-            {/* Campo: Estatus */}
             <div>
-              <label
-                htmlFor="estatus"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Estatus*
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Estatus
               </label>
               <select
-                id="estatus"
                 name="estatus"
                 value={formData.estatus}
                 onChange={handleChange}
-                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
-                <option value="Pendiente">Pendiente</option>
-                <option value="En progreso">En progreso</option>
-                <option value="Entregado/a">Entregado/a</option>
-                <option value="Cancelado">Cancelado</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="en_progreso">En progreso</option>
+                <option value="entregado">Entregado</option>
+                <option value="cancelado">Cancelado</option>
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Teléfono
+              </label>
+              <input
+                type="tel"
+                name="telefono"
+                value={formData.telefono}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Dirección
+              </label>
+              <input
+                type="text"
+                name="direccion"
+                value={formData.direccion}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+            {/* Campo "Asignar a conductor" solo se muestra al editar */}
+            {initialData && drivers && drivers.length > 0 && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Asignar a conductor
+                </label>
+                <select
+                  name="conductor_id"
+                  value={formData.conductor_id || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData((prev) => ({
+                      ...prev,
+                      conductor_id: value ? value : null,
+                    }));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  <option value="">No asignado</option>
+                  {drivers.map((driver) => (
+                    <option key={driver._id} value={driver._id}>
+                      {driver.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
-
-          {/* Campo: Detalles del pedido */}
-          <div className="mb-4">
-            <label
-              htmlFor="detalles"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Detalles del pedido
-            </label>
-            <textarea
-              id="detalles"
-              name="detalles"
-              value={formData.detalles}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Instrucciones especiales, detalles de entrega, etc."
-            ></textarea>
-          </div>
-
-          {/* Botones */}
-          <div className="flex justify-end space-x-3">
+          <div className="mt-6 flex justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
@@ -272,7 +249,7 @@ export function OrderForm({
               type="submit"
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
-              {initialData ? "Actualizar" : "Guardar"}
+              {initialData ? "Actualizar pedido" : "Crear pedido"}
             </button>
           </div>
         </form>

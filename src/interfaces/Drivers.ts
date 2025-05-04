@@ -1,10 +1,11 @@
 export interface Driver {
-  id?: number;
-  name: string;
-  vehicle: string;
-  license: string;
-  photo: string;
-  deliveries: number;
-  status: string;
-  rating: number;
+  _id: string;
+  nombre: string;
+  vehiculo: string;
+  licencia: string;
+  entregasTotales: number;
+  estatus: "disponible" | "en_ruta" | "ocupado" | "descanso";
+  calificacionPromedio: number;
+
+ 
 }

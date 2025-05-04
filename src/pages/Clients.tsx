@@ -1,5 +1,4 @@
-// Este componente muestra una lista de clientes y permite agregar, modificar y eliminar clientes.
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   UserCircle,
   Mail,
@@ -11,75 +10,143 @@ import {
   AlertCircle,
   Phone,
 } from "lucide-react";
-import { clients } from "../data/Clientes";
 import { ClientForm } from "../registros/ClientsForm";
 
-// Definimos la estructura del objeto cliente
 interface Client {
-  id: number;
-  name: string;
+  _id?: string;
+  nombre: string;
   apellido: string;
-  address: string;
-  contact: {
-    email: string;
-    phone: string;
-  };
+  direccion: string;
+  email: string;
+  telefono: string;
 }
 
 export function Clients() {
-  // Estados locales
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [clientsData, setClientsData] = useState<Client[]>(clients as Client[]);
+  const [clientsData, setClientsData] = useState<Client[]>([]);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Filtramos los clientes por nombre, apellido o email
-  const filteredClients = clientsData.filter(
-    (client) =>
-      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (client.apellido &&
-        client.apellido.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  // Maneja el registro de un nuevo cliente
-  const handleAddClient = (clientData: {
-    name: string;
-    apellido: string;
-    address: string;
-    email: string;
-    phone: string;
-  }) => {
-    const newClient: Client = {
-      id: clientsData.length + 1,
-      name: clientData.name,
-      apellido: clientData.apellido,
-      address: clientData.address,
-      contact: {
-        email: clientData.email,
-        phone: clientData.phone,
-      },
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/clientes");
+        const data = await response.json();
+        setClientsData(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error al cargar clientes:", error);
+        setIsLoading(false);
+      }
     };
+    fetchClients();
+  }, []);
 
-    setClientsData([...clientsData, newClient]);
+  const filteredClients = clientsData.filter((client) => {
+    return (
+      (client.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.apellido?.toLowerCase().includes(searchTerm.toLowerCase())) ??
+      false
+    );
+  });
+
+  const handleAddClient = async (clientData: Omit<Client, "_id">) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/clientes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(clientData),
+      });
+
+      if (response.ok) {
+        const newClient = await response.json();
+        setClientsData([...clientsData, newClient]);
+      } else {
+        console.error(
+          "Error en la creación del cliente:",
+          await response.json()
+        );
+      }
+    } catch (error) {
+      console.error("Error al agregar cliente:", error);
+    }
   };
 
-  // Configura el formulario para editar un cliente existente
+  const handleUpdateClient = async (clientData: Omit<Client, "_id">) => {
+    if (!editingClient?._id) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/clientes/${editingClient._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(clientData),
+        }
+      );
+
+      if (response.ok) {
+        const updatedClient = await response.json();
+        setClientsData(
+          clientsData.map((client) =>
+            client._id === editingClient._id ? updatedClient : client
+          )
+        );
+      } else {
+        console.error("Error al actualizar cliente:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error al actualizar cliente:", error);
+    }
+  };
+
   const handleEditClient = (client: Client) => {
     setEditingClient(client);
     setShowForm(true);
   };
 
-  // Elimina un cliente con confirmación previa
-  const handleDeleteClient = (clientId: number) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
-      setClientsData(clientsData.filter((client) => client.id !== clientId));
+  const handleDeleteClient = async (clientId?: string) => {
+    if (
+      !clientId ||
+      !window.confirm("¿Estás seguro de que deseas eliminar este cliente?")
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/clientes/${clientId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        setClientsData(clientsData.filter((client) => client._id !== clientId));
+      } else {
+        console.error("Error al eliminar cliente:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error al eliminar cliente:", error);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Encabezado y botón para agregar cliente */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-0">
           Clientes
@@ -90,12 +157,11 @@ export function Clients() {
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           onClick={() => setShowForm(true)}
         >
-          <Plus className=" h-5 w-5 mr-2" />
-          Agregar un nuevo cliente
+          <Plus className="h-5 w-5 mr-2" />
+          Nuevo cliente
         </button>
       </div>
 
-      {/* Input de búsqueda */}
       <div className="mb-6">
         <div className="relative">
           <input
@@ -109,13 +175,11 @@ export function Clients() {
         </div>
       </div>
 
-      {/* Tabla de clientes filtrados */}
       {filteredClients.length > 0 ? (
         <div className="bg-white dark:bg-gray-800 shadow overflow-x-auto sm:overflow-hidden sm:rounded-lg">
           <table className="min-w-full divide-y divide-gray-400 dark:divide-gray-700">
             <thead className="bg-gray-80 dark:bg-gray-700">
               <tr>
-                {/* Cabeceras de tabla */}
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Nombre
                 </th>
@@ -132,42 +196,36 @@ export function Clients() {
                   Teléfono
                 </th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  Eliminar/Editar
+                  Acciones
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
               {filteredClients.map((client) => (
-                <tr key={client.id}>
-                  {/* Nombre con ícono */}
+                <tr key={client._id}>
                   <td className="px-3 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <UserCircle className="h-8 w-8 text-gray-400" />
                       <div className="ml-2 sm:ml-4 text-sm font-medium text-gray-900 dark:text-white">
-                        {client.name}
+                        {client.nombre}
                       </div>
                     </div>
                   </td>
-                  {/* Apellido */}
                   <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {client.apellido}
                   </td>
-                  {/* Email */}
                   <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white">
                     <Mail className="inline h-3 w-3 mr-1" />
-                    {client.contact.email}
+                    {client.email}
                   </td>
-                  {/* Dirección */}
                   <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white truncate">
                     <MapPin className="inline h-3 w-3 mr-1" />
-                    {client.address}
+                    {client.direccion}
                   </td>
-                  {/* Teléfono */}
                   <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white">
                     <Phone className="inline h-3 w-3 mr-1" />
-                    {client.contact.phone}
+                    {client.telefono}
                   </td>
-                  {/* Acciones: Editar y Eliminar */}
                   <td className="px-3 py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                     <button
                       className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 mr-2"
@@ -177,7 +235,7 @@ export function Clients() {
                     </button>
                     <button
                       className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200"
-                      onClick={() => handleDeleteClient(client.id)}
+                      onClick={() => handleDeleteClient(client._id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -188,7 +246,6 @@ export function Clients() {
           </table>
         </div>
       ) : (
-        // Si no hay clientes que coincidan
         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6 text-center">
             <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
@@ -204,7 +261,6 @@ export function Clients() {
         </div>
       )}
 
-      {/* Formulario Modal para agregar o editar cliente */}
       {showForm && (
         <ClientForm
           onClose={() => {
@@ -213,39 +269,14 @@ export function Clients() {
           }}
           onSubmit={(clientData) => {
             if (editingClient) {
-              // Si estamos editando, actualizamos el cliente
-              const updatedClients = clientsData.map((client) =>
-                client.id === editingClient.id
-                  ? {
-                      ...client,
-                      name: clientData.name,
-                      apellido: clientData.apellido,
-                      address: clientData.address,
-                      contact: {
-                        email: clientData.email,
-                        phone: clientData.phone,
-                      },
-                    }
-                  : client
-              );
-              setClientsData(updatedClients);
+              handleUpdateClient(clientData);
             } else {
-              // Si no, lo agregamos como nuevo
               handleAddClient(clientData);
             }
+            setShowForm(false);
             setEditingClient(null);
           }}
-          initialData={
-            editingClient
-              ? {
-                  name: editingClient.name,
-                  apellido: editingClient.apellido,
-                  address: editingClient.address,
-                  email: editingClient.contact.email,
-                  phone: editingClient.contact.phone,
-                }
-              : undefined
-          }
+          initialData={editingClient || undefined}
         />
       )}
     </div>

@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Dashboard } from "./components/Dashboard";
-import Orders from "./pages/Orders";
+import { Orders } from "./pages/Orders";
 import { RoutesPage } from "./pages/RoutesPage";
 import { Drivers } from "./pages/Drivers";
 import { Reports } from "./pages/Reports";

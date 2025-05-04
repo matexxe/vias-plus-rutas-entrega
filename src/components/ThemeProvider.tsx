@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "system";
+type Theme = "light" | "dark"; 
 
 interface ThemeContextType {
   theme: Theme;
@@ -13,8 +13,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== "undefined") {
       const storedTheme = localStorage.getItem("theme") as Theme | null;
-      if (storedTheme) return storedTheme;
-      return "system";
+      return storedTheme || "light"; // Valor por defecto light
     }
     return "light";
   });
@@ -22,20 +21,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
 
-    const applyTheme = (currentTheme: Theme) => {
-      root.classList.remove("dark");
+    // Aplicamos el data-theme en lugar de clases
+    if (theme === "dark") {
+      root.setAttribute("data-theme", "dark");
+    } else {
+      root.removeAttribute("data-theme");
+    }
 
-      if (currentTheme === "dark") {
-        root.classList.add("dark");
-      } else if (currentTheme === "system") {
-        const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        if (isDarkMode) {
-          root.classList.add("dark");
-        }
-      }
-    };
-
-    applyTheme(theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
