@@ -40,6 +40,34 @@ npm run dev
 
 *Esto es importante:* Todos los datos son simulados. Solo es prueba ya que no he encontrado como ponerlo en produccion en la vida real. 
 
+# Funcionalidad en las entidades cliente, pedido y conductor:
+## Registraremos un cliente para la demostracion: 
+![Image](https://github.com/user-attachments/assets/a23bfcc2-94db-4d4d-8c1d-30a765685962)
+
+## Se verifica que el registro haya llegado a la base de datos, en este caso MongoDB:
+![Image](https://github.com/user-attachments/assets/51611ccc-f192-4fa8-b99b-6c86d7e58abb)
+
+## Crearemos un pedido con la informacion registrada del cliente:
+![Image](https://github.com/user-attachments/assets/fcb7b862-7110-4445-adcb-2a35ed829cb7)
+## Se verifica en la base de datos (Como aun no hay asignacion de conductor, el valor llega como null por defecto)
+![Image](https://github.com/user-attachments/assets/c915176f-7510-4557-a68c-f7e1c4431ffc)
+
+## Se registra un conductor:
+![Captura de pantalla 2025-05-04 171954](https://github.com/user-attachments/assets/d231018a-608c-48eb-92a8-f9a6c398fe04)
+
+## El siguiente punto es asignar un conductor al pedido registrado:
+![Image](https://github.com/user-attachments/assets/9902b2c8-3050-4339-93ba-3e605f59d4c4)
+
+## Mediante el endpoint `GET /api/pedidos/conductor/:conductorId` obtenemos los pedidos que se asocian a un conductor específico:
+![Captura de pantalla 2025-05-04 172558](https://github.com/user-attachments/assets/51ccbaba-076f-4eb3-b8b8-6a3652e528cb)
+
+## Podemos cambiar el estado de disposicion de los conductores:
+![Captura de pantalla 2025-05-04 172736](https://github.com/user-attachments/assets/d8688bc5-7333-4e08-b45d-fa34a05fa1a4)
+
+## Se puede verificar en la base de datos:
+![Captura de pantalla 2025-05-04 172811](https://github.com/user-attachments/assets/3b093d15-b55a-4a13-8245-e2af211750ac)
+
+
 
 
 ## Tecnologias usadas:
@@ -47,3 +75,5 @@ npm run dev
 * TypeScript
 * React
 * Tailwind
+* MongoDB
+* Express.js
