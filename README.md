@@ -58,6 +58,10 @@ npm run dev
 ## El siguiente punto es asignar un conductor al pedido registrado:
 ![Image](https://github.com/user-attachments/assets/9902b2c8-3050-4339-93ba-3e605f59d4c4)
 
+## En la base de datos se puede ver el pedido con el ID del conductor asignado:
+![image](https://github.com/user-attachments/assets/34feac59-0d7a-4759-bc8a-26465d2426d3)
+
+
 ## Mediante el endpoint `GET /api/pedidos/conductor/:conductorId` obtenemos los pedidos que se asocian a un conductor específico:
 ![Captura de pantalla 2025-05-04 172558](https://github.com/user-attachments/assets/51ccbaba-076f-4eb3-b8b8-6a3652e528cb)
 
