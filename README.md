@@ -71,6 +71,15 @@ npm run dev
 ## Se puede verificar en la base de datos:
 ![Captura de pantalla 2025-05-04 172811](https://github.com/user-attachments/assets/3b093d15-b55a-4a13-8245-e2af211750ac)
 
+## Si quisieramos eliminar el pedido, se designa automaticamente del conductor al que se le asigno:
+![image](https://github.com/user-attachments/assets/e659e9d3-3606-40b6-8afd-1ed5a96e05cd)
+![image](https://github.com/user-attachments/assets/14e8aba6-1f89-4830-98ae-377dd7178af1)
+
+## Y la base de datos queda vacia:
+![image](https://github.com/user-attachments/assets/5ffe8416-8ff6-435a-ae6e-eba000860869)
+
+
+
 
 
 
