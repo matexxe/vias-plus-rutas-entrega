@@ -4,21 +4,16 @@ import { OrderForm } from "../registros/OrderForm";
 
 interface Order {
   _id: string;
-  cliente_id: string;
-  conductor_id: string | null;
+  cliente_id: string | { _id: string };
   articulo: string;
   descripcionPedido: string;
   fechaEntrega: string;
-  estatus: "pendiente" | "en_progreso" | "asignado" | "entregado" | "cancelado";
+  estatus: string;
   telefono: string;
   direccion: string;
   email: string;
-  conductor?: {
-    _id: string;
-    nombre: string;
-  };
-  createdAt?: string;
-  updatedAt?: string;
+  conductor_id?: string | null;
+  conductor?: { _id: string; nombre: string };
 }
 
 interface Driver {
@@ -35,7 +30,6 @@ export function Orders() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Función para cargar pedidos (reemplaza tu useEffect inicial)
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
@@ -46,12 +40,11 @@ export function Orders() {
 
       const data = await response.json();
 
-  
       const formattedOrders = data.map((order: any) => ({
         ...order,
         conductor: order.conductor_id
           ? { _id: order.conductor_id._id, nombre: order.conductor_id.nombre }
-          : undefined, // Usa undefined en lugar de null para consistencia
+          : undefined,
       }));
 
       setOrders(formattedOrders);
@@ -62,16 +55,15 @@ export function Orders() {
     }
   };
 
-  // Se actualiza el useEffect inicial para usar fetchOrders
   useEffect(() => {
     const loadInitialData = async () => {
       await fetchOrders();
-      // Carga conductores (opcional, si los necesitas por separado)
       const driversRes = await fetch("http://localhost:5000/api/conductores");
       if (driversRes.ok) setDrivers(await driversRes.json());
     };
     loadInitialData();
   }, []);
+
   const filteredOrders = orders.filter((order) => {
     const searchTermLower = searchTerm.toLowerCase();
     const fieldsToSearch = [
@@ -120,7 +112,6 @@ export function Orders() {
 
       const newOrder = await response.json();
 
-      // Enriquecer el nuevo pedido con la información del conductor si existe
       if (newOrder.conductor_id) {
         const driver = drivers.find((d) => d._id === newOrder.conductor_id);
         newOrder.conductor = driver
@@ -160,7 +151,6 @@ export function Orders() {
 
       const updatedOrder = await response.json();
 
-      // Enriquecer el pedido actualizado con la información del conductor
       const driver = orderData.conductor_id
         ? drivers.find((d) => d._id === orderData.conductor_id)
         : undefined;
@@ -189,6 +179,7 @@ export function Orders() {
       );
     }
   };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pendiente":

@@ -16,7 +16,7 @@ interface OrderFormProps {
   }) => void;
   initialData?: {
     _id?: string;
-    cliente_id: string;
+    cliente_id: string | { _id: string };
     articulo: string;
     descripcionPedido: string;
     fechaEntrega: string;
@@ -48,26 +48,31 @@ export function OrderForm({
     conductor_id: null as string | null,
   });
 
-useEffect(() => {
-  if (initialData) {
-    const fechaEntrega = initialData.fechaEntrega
-      ? new Date(initialData.fechaEntrega).toISOString().slice(0, 16)
-      : "";
-    setFormData({
-      cliente_id: initialData.cliente_id || "",
-      articulo: initialData.articulo || "",
-      descripcionPedido: initialData.descripcionPedido || "",
-      fechaEntrega,
-      estatus: initialData.estatus || "pendiente",
-      telefono: initialData.telefono || "",
-      direccion: initialData.direccion || "",
-      email: initialData.email || "",
-      conductor_id:
-        initialData.conductor_id || initialData.conductor?._id || null,
-    });
-  }
-}, [initialData]);
+  useEffect(() => {
+    if (initialData) {
+      const fechaEntrega = initialData.fechaEntrega
+        ? new Date(initialData.fechaEntrega).toISOString().slice(0, 16)
+        : "";
 
+      // Manejar cliente_id que puede ser string o objeto
+      const clienteId =
+        typeof initialData.cliente_id === "string"
+          ? initialData.cliente_id
+          : initialData.cliente_id?._id || "";
+
+      setFormData({
+        cliente_id: clienteId,
+        articulo: initialData.articulo || "",
+        descripcionPedido: initialData.descripcionPedido || "",
+        fechaEntrega,
+        estatus: initialData.estatus || "pendiente",
+        telefono: initialData.telefono || "",
+        direccion: initialData.direccion || "",
+        email: initialData.email || "",
+        conductor_id: initialData.conductor_id || null,
+      });
+    }
+  }, [initialData]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -209,7 +214,6 @@ useEffect(() => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-            {/* Campo "Asignar a conductor" solo se muestra al editar */}
             {initialData && drivers && drivers.length > 0 && (
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

@@ -110,32 +110,49 @@ export function Clients() {
     setEditingClient(client);
     setShowForm(true);
   };
+const handleDeleteClient = async (clientId?: string) => {
+  if (!clientId) return;
 
-  const handleDeleteClient = async (clientId?: string) => {
-    if (
-      !clientId ||
-      !window.confirm("¿Estás seguro de que deseas eliminar este cliente?")
-    ) {
-      return;
-    }
+  if (
+    !window.confirm(
+      "¿Estás seguro de que deseas eliminar este cliente y todos sus pedidos asociados?"
+    )
+  ) {
+    return;
+  }
 
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/clientes/${clientId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (response.ok) {
-        setClientsData(clientsData.filter((client) => client._id !== clientId));
-      } else {
-        console.error("Error al eliminar cliente:", await response.json());
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/clientes/${clientId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-    } catch (error) {
-      console.error("Error al eliminar cliente:", error);
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Error al eliminar el cliente");
     }
-  };
+
+    // Actualizar el estado local eliminando el cliente
+    setClientsData((prevClients) =>
+      prevClients.filter((client) => client._id !== clientId)
+    );
+
+    // Opcional: Mostrar mensaje de éxito
+    alert("Cliente y pedidos asociados eliminados correctamente");
+  } catch (error) {
+    console.error("Error al eliminar cliente:", error);
+    alert(
+      error instanceof Error
+        ? error.message
+        : "Error desconocido al eliminar cliente"
+    );
+  }
+};
 
   if (isLoading) {
     return (
