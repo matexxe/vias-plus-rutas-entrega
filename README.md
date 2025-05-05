@@ -40,44 +40,109 @@ npm run dev
 
 *Esto es importante:* Todos los datos son simulados. Solo es prueba ya que no he encontrado como ponerlo en produccion en la vida real. 
 
-# Funcionalidad en las entidades cliente, pedido y conductor:
-## Registraremos un cliente para la demostracion: 
-![Image](https://github.com/user-attachments/assets/a23bfcc2-94db-4d4d-8c1d-30a765685962)
+# 🧾 Funcionalidad del sistema: Clientes, pedidos y conductores
 
-## Se verifica que el registro haya llegado a la base de datos, en este caso MongoDB:
-![Image](https://github.com/user-attachments/assets/51611ccc-f192-4fa8-b99b-6c86d7e58abb)
+Este proyecto permite registrar clientes, generar pedidos y asignarlos a conductores disponibles. A continuación, se va a demostrar cómo funciona todo paso a paso:
 
-## Crearemos un pedido con la informacion registrada del cliente:
-![Image](https://github.com/user-attachments/assets/fcb7b862-7110-4445-adcb-2a35ed829cb7)
-## Se verifica en la base de datos (Como aun no hay asignacion de conductor, el valor llega como null por defecto)
-![Image](https://github.com/user-attachments/assets/c915176f-7510-4557-a68c-f7e1c4431ffc)
+---
 
-## Se registra un conductor:
-![Captura de pantalla 2025-05-04 171954](https://github.com/user-attachments/assets/d231018a-608c-48eb-92a8-f9a6c398fe04)
+## ✅ 1. Registro de un cliente
 
-## El siguiente punto es asignar un conductor al pedido registrado:
-![Image](https://github.com/user-attachments/assets/9902b2c8-3050-4339-93ba-3e605f59d4c4)
+Primero registramos un cliente desde la interfaz:
 
-## En la base de datos se puede ver el pedido con el ID del conductor asignado:
-![image](https://github.com/user-attachments/assets/34feac59-0d7a-4759-bc8a-26465d2426d3)
+![Registro de cliente](https://github.com/user-attachments/assets/a23bfcc2-94db-4d4d-8c1d-30a765685962)
+
+### Verificamos que haya llegado correctamente a la base de datos (MongoDB):
+
+![Cliente en MongoDB](https://github.com/user-attachments/assets/51611ccc-f192-4fa8-b99b-6c86d7e58abb)
+
+---
+
+## 📦 2. Creación de un pedido con ese cliente
+
+Creamos un pedido usando la información del cliente recién registrado:
+
+![Creación de pedido](https://github.com/user-attachments/assets/fcb7b862-7110-4445-adcb-2a35ed829cb7)
+
+### Se guarda en la base de datos. Como aún no tiene conductor, ese campo queda en `null` por defecto:
+
+![Pedido sin conductor](https://github.com/user-attachments/assets/c915176f-7510-4557-a68c-f7e1c4431ffc)
+
+---
+
+## 🚗 3. Registro de un conductor
+
+Registramos un conductor disponible para asignar el pedido:
+
+![Registro de conductor](https://github.com/user-attachments/assets/d231018a-608c-48eb-92a8-f9a6c398fe04)
+
+---
+
+## 📝 4. Asignación de conductor al pedido
+
+Asignamos el conductor al pedido registrado:
+
+![Asignación de conductor](https://github.com/user-attachments/assets/9902b2c8-3050-4339-93ba-3e605f59d4c4)
+
+### Verificamos en la base de datos que ahora el pedido tenga asignado el ID del conductor:
+
+![Pedido con conductor asignado](https://github.com/user-attachments/assets/34feac59-0d7a-4759-bc8a-26465d2426d3)
+
+---
+
+## 🚦 5. Consultar pedidos de un conductor
+
+Mediante el endpoint `GET /api/pedidos/conductor/:conductorId`, podemos obtener todos los pedidos asociados a un conductor específico:
+
+![Pedidos de un conductor](https://github.com/user-attachments/assets/51ccbaba-076f-4eb3-b8b8-6a3652e528cb)
+
+---
+
+## 🔄 6. Cambio de estado de disposición del conductor
+
+Podemos cambiar el estado de disposición de un conductor para asignarle nuevos pedidos o retirarlo de los disponibles:
+
+![Cambio de estado del conductor](https://github.com/user-attachments/assets/d8688bc5-7333-4e08-b45d-fa34a05fa1a4)
+
+### Verificamos el cambio en la base de datos:
+
+![Estado actualizado en la base de datos](https://github.com/user-attachments/assets/3b093d15-b55a-4a13-8245-e2af211750ac)
+
+---
+
+## 🗑️ 7. Eliminación de un pedido
+
+Si eliminamos un pedido, el conductor también pierde la asignación automáticamente:
+
+![Eliminación de pedido](https://github.com/user-attachments/assets/e659e9d3-3606-40b6-8afd-1ed5a96e05cd)
+![Pedido eliminado](https://github.com/user-attachments/assets/14e8aba6-1f89-4830-98ae-377dd7178af1)
+
+### La base de datos ahora queda vacía:
+
+![Base de datos vacía](https://github.com/user-attachments/assets/5ffe8416-8ff6-435a-ae6e-eba000860869)
+
+---
+
+## 🧹 8. Eliminación de un cliente y sus pedidos asociados
+
+Cuando se elimina un cliente, el sistema también elimina automáticamente todos sus pedidos asociados. Esto se logra mediante una operación en el backend que primero busca y elimina todos los documentos de la colección de pedidos cuyo campo `cliente_id` coincida con el ID del cliente, y luego elimina al cliente de la base de datos. Así se garantiza la integridad de los datos y se evita dejar registros vacíos. 
+
+![image](https://github.com/user-attachments/assets/e43698d9-aff5-4d0a-8f37-207f5fc7cd7c)
+![image](https://github.com/user-attachments/assets/22ef8356-d33f-4c21-9c05-ce3d36ed37b9)
+![image](https://github.com/user-attachments/assets/883e765a-8c9a-41bf-b9ce-1016f5c60daa)
 
 
-## Mediante el endpoint `GET /api/pedidos/conductor/:conductorId` obtenemos los pedidos que se asocian a un conductor específico:
-![Captura de pantalla 2025-05-04 172558](https://github.com/user-attachments/assets/51ccbaba-076f-4eb3-b8b8-6a3652e528cb)
 
-## Podemos cambiar el estado de disposicion de los conductores:
-![Captura de pantalla 2025-05-04 172736](https://github.com/user-attachments/assets/d8688bc5-7333-4e08-b45d-fa34a05fa1a4)
 
-## Se puede verificar en la base de datos:
-![Captura de pantalla 2025-05-04 172811](https://github.com/user-attachments/assets/3b093d15-b55a-4a13-8245-e2af211750ac)
 
-## Si quisieramos eliminar el pedido, se designa automaticamente del conductor al que se le asigno:
-![image](https://github.com/user-attachments/assets/e659e9d3-3606-40b6-8afd-1ed5a96e05cd)
-![image](https://github.com/user-attachments/assets/14e8aba6-1f89-4830-98ae-377dd7178af1)
 
-## Y la base de datos queda vacia:
-![image](https://github.com/user-attachments/assets/5ffe8416-8ff6-435a-ae6e-eba000860869)
+Aquí está el fragmento de código responsable de esta operación:
 
+```js
+await Pedido.deleteMany({ cliente_id: id });
+await Cliente.findByIdAndDelete(id);
+
+```
 
 
 
