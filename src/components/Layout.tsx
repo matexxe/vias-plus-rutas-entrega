@@ -1,4 +1,3 @@
-"use client";
 
 // Importamos React y herramientas de navegación desde React Router
 import React from "react";
