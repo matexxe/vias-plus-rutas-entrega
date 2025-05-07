@@ -47,7 +47,7 @@ export function Register() {
         loop
         muted
         playsInline
-        src="/src/assets/videos/video-1.mp4"
+        src="/videos/video-1.mp4"
       ></video>
 
       {/* Capa oscura sobre el video para mejorar legibilidad */}

@@ -43,7 +43,7 @@ export function Login() {
         autoPlay
         loop
         muted
-        src="/src/assets/videos/video-2.mp4" // Ruta del video de fondo
+        src="/videos/video-2.mp4" // Ruta del video de fondo
       ></video>
 
       {/* Capa superpuesta oscura para mejorar la legibilidad del contenido */}
