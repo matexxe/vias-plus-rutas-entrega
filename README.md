@@ -22,15 +22,16 @@ npm run dev
 ```
 
 ## Lista de requerimientos funcionales:
-1.	El sistema cuenta con un dashboard donde se resume el estado del sistema con datos relevantes. 
-2.	El sistema permite registrar, consultar, eliminar y actualizar clientes en tiempo real.
-3.	El sistema permite registrar, consultar, eliminar y actualizar pedidos en tiempo real. 
-4.	El sistema permite hacer seguimiento de pedidos en tránsito.
-5.	El sistema cuenta con una función de rutas, que calcula la dirección del cliente desde la ubicación del negocio optimizando el trayecto.
-6.	El sistema puede calcular la dirección del pedido a entregar, da unas instrucciones para la eficiencia de la entrega.
-7.	El sistema permite registrar, consultar, eliminar y actualizar conductores en tiempo real. También se le permite al administrador asignarle pedidos. 
-8.	El sistema permite generar reportes para analizar eficiencia y métricas de entregas. 
-9.	El sistema permite una configuración donde pueden verse las notificaciones. Se permite eliminar reportes y seguir el historial de los últimos pedidos.
+1.	El sistema cuenta con un dashboard donde se resume el estado del sistema con datos relevantes.
+2.	El sistema permite iniciar sesion con nombre de usuario y clave.
+3.	El sistema permite registrar, consultar, eliminar y actualizar clientes en tiempo real.
+4.	El sistema permite registrar, consultar, eliminar y actualizar pedidos en tiempo real. 
+5.	El sistema permite hacer seguimiento de pedidos en tránsito.
+6.	El sistema cuenta con una función de rutas, que calcula la dirección del cliente desde la ubicación del negocio optimizando el trayecto.
+7.	El sistema puede calcular la dirección del pedido a entregar, da unas instrucciones para la eficiencia de la entrega.
+8.	El sistema permite registrar, consultar, eliminar y actualizar conductores en tiempo real. También se le permite al administrador asignarle pedidos. 
+9.	El sistema permite generar reportes para analizar eficiencia y métricas de entregas. 
+10.	El sistema permite una configuración donde pueden verse las notificaciones. Se permite eliminar reportes y seguir el historial de los últimos pedidos.
 
 
 ## Lista de requerimientos no funcionales:
