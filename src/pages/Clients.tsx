@@ -51,7 +51,6 @@ export function Clients() {
       false
     );
   });
-
   const handleAddClient = async (clientData: Omit<Client, "_id">) => {
     try {
       const response = await fetch("http://localhost:5000/api/clientes", {

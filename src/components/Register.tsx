@@ -15,7 +15,7 @@ export function Register() {
 
   // Estado del formulario de registro
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
     businessName: "",
     businessType: "store" as BusinessType, // Tipo de negocio por defecto
@@ -98,6 +98,7 @@ export function Register() {
                     id="businessName"
                     name="businessName"
                     type="text"
+                    placeholder="Ingrese su nombre de negocio"
                     required
                     value={formData.businessName}
                     onChange={(e) =>
@@ -151,11 +152,12 @@ export function Register() {
                     id="email"
                     name="email"
                     type="email"
+                    placeholder="Ingrese su correo electronico"
                     autoComplete="email"
                     required
-                    value={formData.email}
+                    value={formData.username}
                     onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
+                      setFormData({ ...formData, username: e.target.value })
                     }
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
                   />
@@ -175,6 +177,7 @@ export function Register() {
                     id="password"
                     name="password"
                     type="password"
+                    placeholder="Ingrese la contraseña"
                     autoComplete="new-password"
                     required
                     value={formData.password}

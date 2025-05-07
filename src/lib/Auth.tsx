@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 // Definición de la interfaz para el usuario (tienda) autenticado
 interface User {
   id: string;
-  email: string;
+  username: string;
   businessName: string;
   businessType: "store" | "restaurant" | "pharmacy";
 }
@@ -24,17 +24,10 @@ interface AuthState {
 const mockUsers: (User & { password: string })[] = [
   {
     id: "1",
-    email: "mitienda@gmail.com",
+    username: "mitienda",
     password: "1234",
     businessName: "Mi Tienda",
     businessType: "store",
-  },
-  {
-    id: "2",
-    email: "restaurante@example.com",
-    password: "123456",
-    businessName: "Mi Restaurante",
-    businessType: "restaurant",
   },
 ];
 
@@ -47,13 +40,13 @@ export const useAuth = create<AuthState>()(
       isAuthenticated: false,
 
       /**
-       * Inicia sesión con un email y contraseña.
-       * Busca en la lista de usuarios simulada (mockUsers).
+       * Inicia sesión con un username y contraseña.
+       * Busca en la lista de usuarios simulada.
        * Lanza un error si las credenciales no coinciden.
        */
       login: async (email: string, password: string) => {
         const user = mockUsers.find(
-          (u) => u.email === email && u.password === password
+          (u) => u.username === email && u.password === password
         );
 
         if (!user) {
@@ -71,7 +64,7 @@ export const useAuth = create<AuthState>()(
        * Almacena el nuevo usuario en la lista simulada y actualiza el estado.
        */
       register: async (userData) => {
-        const exists = mockUsers.some((u) => u.email === userData.email);
+        const exists = mockUsers.some((u) => u.username === userData.username);
 
         if (exists) {
           throw new Error("El usuario ya existe");
@@ -79,7 +72,7 @@ export const useAuth = create<AuthState>()(
 
         const newUser = {
           id: String(mockUsers.length + 1),
-          email: userData.email,
+          username: userData.username,
           businessName: userData.businessName,
           businessType: userData.businessType,
         };

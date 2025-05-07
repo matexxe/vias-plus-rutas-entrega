@@ -11,7 +11,7 @@ export function Login() {
   const [loading, setLoading] = useState(false); // Estado para indicar si está cargando
   const [error, setError] = useState<string | null>(null); // Estado para mensajes de error
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   }); // Estado para el formulario
 
@@ -23,7 +23,7 @@ export function Login() {
 
     try {
       // Intenta iniciar sesión con los datos proporcionados
-      await login(formData.email, formData.password);
+      await login(formData.username, formData.password);
       navigate("/"); // Redirige a la página principal si inicia sesión correctamente
     } catch (error) {
       // Muestra el mensaje de error si ocurre un fallo al iniciar sesión
@@ -87,18 +87,18 @@ export function Login() {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  Correo electrónico
+                  Nombre de usuario
                 </label>
                 <div className="mt-1">
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Ingrese su nombre de usuario"
                     required
-                    value={formData.email}
+                    value={formData.username}
                     onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
+                      setFormData({ ...formData, username: e.target.value })
                     }
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:text-white"
                   />
@@ -118,6 +118,7 @@ export function Login() {
                     id="password"
                     name="password"
                     type="password"
+                    placeholder="Ingrese su contraseña"
                     autoComplete="current-password"
                     required
                     value={formData.password}
@@ -155,7 +156,7 @@ export function Login() {
               </div>
               <div className="mt-6 text-sm">
                 <p className="text-gray-500 dark:text-gray-400">
-                  Email: mitienda@gmail.com
+                  Username: mitienda
                   <br />
                   Contraseña: 1234
                 </p>
