@@ -5,7 +5,7 @@ export interface PerformanceData {
     datasets: {
       label: string;
       data: number[];
-      backgroundColor: string;
+   
     }[];
   }
   
@@ -20,7 +20,7 @@ export interface PerformanceData {
   }
   
   // Tipo para los reportes disponibles
-  export interface AvailableReport {
+  export interface ReportAvailable {
     _id: string;
     name: string;
     description: string;

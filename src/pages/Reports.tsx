@@ -18,7 +18,7 @@ import {
 } from "../service/reportService";
 import {
   PerformanceData,
-  AvailableReport,
+  ReportAvailable,
   Conductor,
 } from "../interfaces/Report";
 
@@ -36,7 +36,7 @@ const API_URL = "http://localhost:5000/api";
 export function Reports() {
   const [performanceData, setPerformanceData] =
     useState<PerformanceData | null>(null);
-  const [reports, setReports] = useState<AvailableReport[]>([]);
+  const [reports, setReports] = useState<ReportAvailable[]>([]);
   const [conductores, setConductores] = useState<Conductor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
