@@ -152,6 +152,23 @@ https://github.com/matexxe/express-vias-plus
 ```
 
 
+## Funcionalidad del gráfico de rendimiento
+
+El gráfico de barras muestra el desempeño de entregas por conductor, permitiendo visualizar cambios en los estados. Aquellos pedidos que esten proceso, quedan como atrasados en el grafico.
+Pasa igual con los demas estados, solo cuenta como entregado cuando el pedido tiene ese estado.
+
+Ejes del gráfico:
+
+- El eje X representa los distintos estados de las entregas (entregado, en progreso, pendiente, cancelado).
+- El eje Y indica la cantidad de entregas en cada estado.
+![Captura de pantalla 2025-05-09 144751](https://github.com/user-attachments/assets/1cb12e81-d7f4-4515-8b48-7057969b5660)
+
+## Generacion de PDF
+
+Se genera el pdf con todos los datos
+
+![image](https://github.com/user-attachments/assets/b9197882-ad3f-4186-ab5a-debd004c24b5)
+
 
 
 
