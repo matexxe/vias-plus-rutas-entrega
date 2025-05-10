@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Edit, Trash2, AlertCircle } from "lucide-react";
+import { Search, Plus, Edit, Trash2, AlertCircle, Loader2 } from "lucide-react";
 import { OrderForm } from "../registros/OrderForm";
 
 interface Order {
@@ -199,23 +199,28 @@ export function Orders() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="mt-4 text-gray-600 dark:text-gray-300">
+          Cargando pedidos...
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-400 p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <AlertCircle className="h-5 w-5 text-red-400" />
-          </div>
-          <div className="ml-3">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        </div>
+      <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+        <h3 className="text-red-800 dark:text-red-200 font-medium">
+          Error al cargar pedidos
+        </h3>
+        <p className="text-red-600 dark:text-red-300 mt-2">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-900/40"
+        >
+          Reintentar
+        </button>
       </div>
     );
   }

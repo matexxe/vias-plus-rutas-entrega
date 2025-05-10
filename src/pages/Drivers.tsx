@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, AlertCircle, User } from "lucide-react";
+import { Plus, Edit, Trash2, User, Loader2 } from "lucide-react";
 import { DriverForm } from "../registros/DriverForm";
 
 interface OrderDriver {
@@ -38,9 +38,10 @@ export function Drivers() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Primera carga - conductores
         setLoading(true);
+        setError(null);
 
-        // Cargar conductores
         const driversResponse = await fetch(
           "http://localhost:5000/api/conductores"
         );
@@ -48,23 +49,32 @@ export function Drivers() {
         const driversData = await driversResponse.json();
         setDrivers(driversData);
 
-        // Cargar pedidos para cada conductor
-        setLoadingOrders(true);
-        const ordersMap: Record<string, OrderDriver[]> = {};
+        // Segunda carga - pedidos (solo si hay conductores)
+        if (driversData.length > 0) {
+          setLoadingOrders(true);
+          const ordersMap: Record<string, OrderDriver[]> = {};
 
-        await Promise.all(
-          driversData.map(async (driver: Driver) => {
-            const ordersResponse = await fetch(
-              `http://localhost:5000/api/pedidos/conductor/${driver._id}`
-            );
-            if (ordersResponse.ok) {
-              const orders = await ordersResponse.json();
-              ordersMap[driver._id] = orders;
-            }
-          })
-        );
+          await Promise.all(
+            driversData.map(async (driver: Driver) => {
+              try {
+                const ordersResponse = await fetch(
+                  `http://localhost:5000/api/pedidos/conductor/${driver._id}`
+                );
+                if (ordersResponse.ok) {
+                  const orders = await ordersResponse.json();
+                  ordersMap[driver._id] = orders;
+                }
+              } catch (err) {
+                console.error(
+                  `Error cargando pedidos para conductor ${driver._id}:`,
+                  err
+                );
+              }
+            })
+          );
 
-        setDriverOrdersMap(ordersMap);
+          setDriverOrdersMap(ordersMap);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido");
       } finally {
@@ -76,6 +86,16 @@ export function Drivers() {
     fetchData();
   }, []);
 
+  if (loading || loadingOrders) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="mt-4 text-gray-600 dark:text-gray-300">
+          {loading ? "Cargando conductores..." : "Cargando pedidos..."}
+        </p>
+      </div>
+    );
+  }
   // Crear o actualizar conductor
   const handleAddOrUpdateDriver = async (driverData: Omit<Driver, "_id">) => {
     try {
@@ -153,24 +173,34 @@ export function Drivers() {
     }
   };
 
-  if (loading) {
+  if (loading || loadingOrders) {
     return (
-      <div className="container mt-4 flex justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="mt-4 text-gray-600 dark:text-gray-300">
+          {loading ? "Cargando conductores..." : "Cargando pedidos..."}
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mt-4 bg-red-50 border-l-4 border-red-500 p-4">
-        <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-          <p className="text-red-700">{error}</p>
-        </div>
+      <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+        <h3 className="text-red-800 dark:text-red-200 font-medium">
+          Error al cargar conductores
+        </h3>
+        <p className="text-red-600 dark:text-red-300 mt-2">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-900/40"
+        >
+          Reintentar
+        </button>
       </div>
     );
   }
+
 
   return (
     <div className="container -mt-2">

@@ -9,6 +9,7 @@ import {
   Plus,
   AlertCircle,
   Phone,
+  Loader2,
 } from "lucide-react";
 import { ClientForm } from "../registros/ClientsForm";
 
@@ -27,16 +28,29 @@ export function Clients() {
   const [clientsData, setClientsData] = useState<Client[]>([]);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const response = await fetch("http://localhost:5000/api/clientes");
+
+        if (!response.ok) {
+          throw new Error("Error al cargar clientes");
+        }
+
         const data = await response.json();
         setClientsData(data);
-        setIsLoading(false);
       } catch (error) {
         console.error("Error al cargar clientes:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Ocurrió un error al cargar los clientes"
+        );
+      } finally {
         setIsLoading(false);
       }
     };
@@ -51,6 +65,7 @@ export function Clients() {
       false
     );
   });
+
   const handleAddClient = async (clientData: Omit<Client, "_id">) => {
     try {
       const response = await fetch("http://localhost:5000/api/clientes", {
@@ -61,17 +76,20 @@ export function Clients() {
         body: JSON.stringify(clientData),
       });
 
-      if (response.ok) {
-        const newClient = await response.json();
-        setClientsData([...clientsData, newClient]);
-      } else {
-        console.error(
-          "Error en la creación del cliente:",
-          await response.json()
-        );
+      if (!response.ok) {
+        throw new Error("Error en la creación del cliente");
       }
+
+      const newClient = await response.json();
+      setClientsData([...clientsData, newClient]);
+      setShowForm(false);
     } catch (error) {
       console.error("Error al agregar cliente:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al agregar el cliente"
+      );
     }
   };
 
@@ -90,18 +108,25 @@ export function Clients() {
         }
       );
 
-      if (response.ok) {
-        const updatedClient = await response.json();
-        setClientsData(
-          clientsData.map((client) =>
-            client._id === editingClient._id ? updatedClient : client
-          )
-        );
-      } else {
-        console.error("Error al actualizar cliente:", await response.json());
+      if (!response.ok) {
+        throw new Error("Error al actualizar cliente");
       }
+
+      const updatedClient = await response.json();
+      setClientsData(
+        clientsData.map((client) =>
+          client._id === editingClient._id ? updatedClient : client
+        )
+      );
+      setShowForm(false);
+      setEditingClient(null);
     } catch (error) {
       console.error("Error al actualizar cliente:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al actualizar el cliente"
+      );
     }
   };
 
@@ -109,54 +134,71 @@ export function Clients() {
     setEditingClient(client);
     setShowForm(true);
   };
-const handleDeleteClient = async (clientId?: string) => {
-  if (!clientId) return;
 
-  if (
-    !window.confirm(
-      "¿Estás seguro de que deseas eliminar este cliente y todos sus pedidos asociados?"
-    )
-  ) {
-    return;
-  }
+  const handleDeleteClient = async (clientId?: string) => {
+    if (!clientId) return;
 
-  try {
-    const response = await fetch(
-      `http://localhost:5000/api/clientes/${clientId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Error al eliminar el cliente");
+    if (
+      !window.confirm(
+        "¿Estás seguro de que deseas eliminar este cliente y todos sus pedidos asociados?"
+      )
+    ) {
+      return;
     }
 
-    // Actualizar el estado local eliminando el cliente
-    setClientsData((prevClients) =>
-      prevClients.filter((client) => client._id !== clientId)
-    );
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/clientes/${clientId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    // Opcional: Mostrar mensaje de éxito
-    alert("Cliente y pedidos asociados eliminados correctamente");
-  } catch (error) {
-    console.error("Error al eliminar cliente:", error);
-    alert(
-      error instanceof Error
-        ? error.message
-        : "Error desconocido al eliminar cliente"
-    );
-  }
-};
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al eliminar el cliente");
+      }
+
+      setClientsData((prevClients) =>
+        prevClients.filter((client) => client._id !== clientId)
+      );
+    } catch (error) {
+      console.error("Error al eliminar cliente:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al eliminar el cliente"
+      );
+    }
+  };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="mt-4 text-gray-600 dark:text-gray-300">
+          Cargando clientes...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+        <h3 className="text-red-800 dark:text-red-200 font-medium">
+          Error al cargar clientes
+        </h3>
+        <p className="text-red-600 dark:text-red-300 mt-2">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-900/40"
+        >
+          Reintentar
+        </button>
       </div>
     );
   }
@@ -289,8 +331,6 @@ const handleDeleteClient = async (clientId?: string) => {
             } else {
               handleAddClient(clientData);
             }
-            setShowForm(false);
-            setEditingClient(null);
           }}
           initialData={editingClient || undefined}
         />

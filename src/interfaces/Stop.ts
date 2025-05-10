@@ -5,4 +5,5 @@ export interface Stop {
   type: "store" | "restaurant" | "pharmacy" | "supermarket";
   time: string;
   coordinates: [number, number];
+
 }
