@@ -169,7 +169,19 @@ Se genera el pdf con todos los datos
 
 ![image](https://github.com/user-attachments/assets/b9197882-ad3f-4186-ab5a-debd004c24b5)
 
+## 🗺️ Gestión de rutas con OpenStreetMap
+Esta aplicación permite al administrador planificar rutas de entrega de forma eficiente usando OpenStreetMap y Leaflet.
 
+🔄 Flujo de trabajo
+
+- **Inicio en ubicación actual:** se usa como punto de partida.
+- **Agregar paradas:** el administrador ingresa direcciones de clientes o tiendas.
+- **Geolocalización automática:** las direcciones se convierten en coordenadas.
+- **Optimización de ruta:** el sistema calcula la ruta más corta conectando las paradas.
+- **Visualización en mapa:** se muestra una ruta interactiva con instrucciones en español.
+- **Hora estimada de llegada:** se calcula el tiempo estimado de llegada a cada punto.
+
+![image](https://github.com/user-attachments/assets/cd910fcd-3628-49ef-89db-11170a90423e)
 
 
 ## Tecnologias usadas:
